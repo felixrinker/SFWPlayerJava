@@ -1,4 +1,4 @@
-package is.ru.gapl;
+package is.ru.gapl.strategy;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import org.eclipse.palamedes.gdl.core.simulation.strategies.AbstractStrategy;
 
 public class MyRandomStrategy extends AbstractStrategy {
 
-    @Override
+	@Override
     public IMove getMove(IGameNode currentNode) {
 
     	/** XXX: All strategy relevant code goes in here. */
