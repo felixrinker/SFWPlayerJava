@@ -2,6 +2,8 @@ package is.ru.gapl;
 
 import org.eclipse.palamedes.gdl.core.simulation.StrategyFactory;
 
+import is.ru.gapl.strategy.MyRandomStrategy;
+
 import java.io.IOException;
 import java.util.Arrays;
 
