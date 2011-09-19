@@ -1,0 +1,119 @@
+#=================
+#eclipse-workspace
+#=================
+.metadata
+
+#=================
+#eclipse-project
+#=================
+*.project
+*.classpath
+*.settings
+.checkstyle
+.checkstyleCheckerConfig
+
+#=================
+#maven-files
+#=================
+*target
+*bin
+
+#=================
+#log-files
+#=================
+*app.log*
+*edb.log*
+*derby.log*
+*.appdata
+log
+
+#=================
+#application data
+#=================
+*activemq-data
+*_default_
+features/hydro-edb/reset-repo
+features/hydro-edb/null*
+hydro-docs/src/main/resources/manual/hydro.pdf
+
+hydro-edb/bin/
+hydro-edb/reset-repo/
+hydro-ui/bin/
+hydro-ui/backup.tar.gz
+hydro-ui/src/main/resources/backup.tar.gz
+hydro-ui/src/test/resources/backup.tar.gz
+hydro-ui/src/test/resources/*.tar.gz
+hydro-ui/src/test/resources/*.tar
+hydro-ui/src/test/selenium/0_setupGlobalVariables.html
+*backup.tar.gz
+
+aag-ui/backup.tar.gz
+aag-ui/src/main/resources/backup.tar.gz
+aag-ui/src/test/resources/backup.tar.gz
+aag-ui/src/test/resources/*.tar.gz
+aag-ui/src/test/resources/*.tar
+aag-ui/src/test/selenium/0_setupGlobalVariables.html
+
+#================
+#eclipse additional gui files
+#================
+*.xml.ext
+*.springBeans
+release
+
+#================
+#Mac OS X hidden files/folders
+#================
+.DS_Store
+
+#================
+#OpenEngSB Files
+#================
+*velocity*
+*runner
+
+etc/scripts/start.sh
+
+#================
+#unix/OpenOffice lock files
+#================
+*.~lock*#
+
+#================
+#vim files
+#================
+*.swp
+
+#================
+#IntelliJ files
+#================
+*.iml
+*.iws
+*.ipr
+
+#================
+# c++
+#================
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.so
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+# c Eclipse project
+.cproject
+
+# Compiled executable
+myPlayer
+
+Default/
+logs/
+*.d
+*.mk
