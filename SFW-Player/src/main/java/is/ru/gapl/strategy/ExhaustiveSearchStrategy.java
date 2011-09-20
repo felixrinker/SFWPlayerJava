@@ -133,7 +133,7 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 		
 		ArrayList<Node> nodeList				= new ArrayList<Node>();
 		ArrayList<ActionNodePair> actionList	= new ArrayList<ActionNodePair>();
-		Node childNode = null;
+		
 		try {
 			IMove[] moves = game.getReasoner().getLegalMoves(roleName, node.getState());
 			
@@ -145,7 +145,7 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 				IGameState newState	= game.getReasoner().getNextState(node.getState(), singleMove);
 				
 				if(!nodeCache.containsKey(newState)) {
-					childNode		= new Node();
+					Node childNode		= new Node();
 					childNode.setState(newState);
 					childNode.setParentNode(null);
 					childNode.setScore(-1);
@@ -161,6 +161,11 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 					actionList.add(newACP);
 					
 					nodeCache.put(newState, childNode);
+				}else {
+					ActionNodePair newACP = new ActionNodePair();
+					newACP.setAction(singleMove[0]);
+					newACP.setNode(nodeCache.get(newState));
+					actionList.add(newACP);
 				}
 				
 				
