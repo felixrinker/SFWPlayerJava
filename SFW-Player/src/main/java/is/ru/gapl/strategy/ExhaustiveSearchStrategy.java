@@ -4,9 +4,8 @@ import is.ru.gapl.model.ActionNodePair;
 import is.ru.gapl.model.Node;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.palamedes.gdl.core.model.IGameNode;
 import org.eclipse.palamedes.gdl.core.model.IGameState;
@@ -18,6 +17,7 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 	private Node searchTreeRoot;
 	private ArrayList<Node> fringe;
 	private String roleName;
+	private HashMap<IGameState, Node> nodeCache;
 	
     /**
 	 * @param searchTreeRoot
@@ -28,6 +28,7 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 		super();
 		this.searchTreeRoot = null;
 		this.fringe			= new ArrayList<Node>();
+		this.nodeCache		= new HashMap<IGameState, Node>();
 	}
 	
 	@Override
@@ -132,7 +133,7 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 		
 		ArrayList<Node> nodeList				= new ArrayList<Node>();
 		ArrayList<ActionNodePair> actionList	= new ArrayList<ActionNodePair>();
-		Node childNode = null;
+		
 		try {
 			IMove[] moves = game.getReasoner().getLegalMoves(roleName, node.getState());
 			
@@ -142,20 +143,32 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 				singleMove[0] = move;
 			
 				IGameState newState	= game.getReasoner().getNextState(node.getState(), singleMove);
-				childNode		= new Node();
-				childNode.setState(newState);
-				childNode.setParentNode(null);
-				childNode.setScore(-1);
+				
+				if(!nodeCache.containsKey(newState)) {
+					Node childNode		= new Node();
+					childNode.setState(newState);
+					childNode.setParentNode(null);
+					childNode.setScore(-1);
 
-				if(newState.isTerminal()) { 
-					childNode.setScore(game.getReasoner().getGoalValue(roleName, newState));
+					if(newState.isTerminal()) { 
+						childNode.setScore(game.getReasoner().getGoalValue(roleName, newState));
+					}
+					
+					nodeList.add(childNode);
+					ActionNodePair newACP = new ActionNodePair();
+					newACP.setAction(singleMove[0]);
+					newACP.setNode(childNode);
+					actionList.add(newACP);
+					
+					nodeCache.put(newState, childNode);
+				}else {
+					ActionNodePair newACP = new ActionNodePair();
+					newACP.setAction(singleMove[0]);
+					newACP.setNode(nodeCache.get(newState));
+					actionList.add(newACP);
 				}
 				
-				nodeList.add(childNode);
-				ActionNodePair newACP = new ActionNodePair();
-				newACP.setAction(singleMove[0]);
-				newACP.setNode(childNode);
-				actionList.add(newACP);
+				
 			}	
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
