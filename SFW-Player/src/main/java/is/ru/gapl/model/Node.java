@@ -7,11 +7,12 @@ import java.util.Collections;
 
 
 import org.eclipse.palamedes.gdl.core.model.IGameNode;
+import org.eclipse.palamedes.gdl.core.model.IGameState;
 
 public class Node implements Serializable {
 
 	private static final long serialVersionUID = -5235334727724273744L;
-	private IGameNode state;
+	private IGameState state;
 	private Node parentNode;
 	private ArrayList<ActionNodePair> actionList;
 	private int score;
@@ -31,12 +32,12 @@ public class Node implements Serializable {
 		this.score = score;
 	}
 
-	public IGameNode getState() {
+	public IGameState getState() {
 		return state;
 	}
 
-	public void setState(IGameNode state) {
-		this.state = state;
+	public void setState(IGameState newState) {
+		this.state = newState;
 	}
 
 	public Node getParentNode() {

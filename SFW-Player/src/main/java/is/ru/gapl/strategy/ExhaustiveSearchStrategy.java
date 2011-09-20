@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.palamedes.gdl.core.model.IGameNode;
+import org.eclipse.palamedes.gdl.core.model.IGameState;
 import org.eclipse.palamedes.gdl.core.model.IMove;
 import org.eclipse.palamedes.gdl.core.simulation.strategies.AbstractStrategy;
 
@@ -16,6 +17,7 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 
 	private Node searchTreeRoot;
 	private ArrayList<Node> fringe;
+	private String roleName;
 	
     /**
 	 * @param searchTreeRoot
@@ -35,17 +37,18 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 		if(previousMoves != null) {
 			
 			this.searchTreeRoot = new Node();
-			this.searchTreeRoot.setState(currentNode);
+			this.searchTreeRoot.setState(currentNode.getState());
 			this.searchTreeRoot.setParentNode(null);
 			this.searchTreeRoot.setScore(-1);
 			this.fringe.add(this.searchTreeRoot);
 		}else {
 			Node startNode = new Node();
-			startNode.setState(currentNode);
+			startNode.setState(currentNode.getState());
 			startNode.setParentNode(null);
 			startNode.setScore(-1);
 			this.fringe.add(startNode);
 			this.searchTreeRoot = startNode;
+			this.roleName = game.getRoleNames()[playerNumber];
 		}
 		// TODO Auto-generated method stub
 		return solve(searchTreeRoot);
@@ -130,22 +133,21 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 		ArrayList<ActionNodePair> actionList	= new ArrayList<ActionNodePair>();
 		Node childNode = null;
 		try {
-			IMove[][] moves = game.getLegalMoves(node.getState());
-			List<IMove[]> cmoves = game.getCombinedMoves(node.getState());
+			IMove[] moves = game.getReasoner().getLegalMoves(roleName, node.getState());
 			
-			for (IMove[] mp : cmoves) {
+			for (IMove move : moves) {
 				
 				IMove[] singleMove = new IMove[1];
-				singleMove[0] = mp[playerNumber];
-				
-				IGameNode newState	= game.getNextNode(node.getState(), singleMove);
+				singleMove[0] = move;
+			
+				IGameState newState	= game.getReasoner().getNextState(node.getState(), singleMove);
 				childNode		= new Node();
 				childNode.setState(newState);
 				childNode.setParentNode(null);
 				childNode.setScore(-1);
 
 				if(newState.isTerminal()) { 
-					childNode.setScore(game.getGoalValues(newState)[playerNumber]);
+					childNode.setScore(game.getReasoner().getGoalValue(roleName, newState));
 				}
 				
 				nodeList.add(childNode);
