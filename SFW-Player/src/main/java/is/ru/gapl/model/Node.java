@@ -17,6 +17,7 @@ public class Node implements Serializable {
 	private int score;
 	
 	public Node() {
+        actionList = new ArrayList<ActionNodePair>();
 	}
 
 	/*************************** GETTER / SETTER *******************************/

@@ -117,3 +117,5 @@ Default/
 logs/
 *.d
 *.mk
+
+SFW-Player/build/
