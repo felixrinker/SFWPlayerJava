@@ -4,7 +4,10 @@ import is.ru.gapl.model.ActionNodePair;
 import is.ru.gapl.model.Node;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+
 import org.eclipse.palamedes.gdl.core.model.IGameNode;
 import org.eclipse.palamedes.gdl.core.model.IMove;
 import org.eclipse.palamedes.gdl.core.simulation.strategies.AbstractStrategy;
@@ -12,7 +15,7 @@ import org.eclipse.palamedes.gdl.core.simulation.strategies.AbstractStrategy;
 public class ExhaustiveSearchStrategy extends AbstractStrategy {
 
 	private Node searchTreeRoot;
-	private List<Node> fringe;
+	private ArrayList<Node> fringe;
 	
     /**
 	 * @param searchTreeRoot
@@ -31,9 +34,16 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 		IMove[] previousMoves = currentNode.getMoves();
 		if(previousMoves != null) {
 			
-			this.searchTreeRoot = new Node(currentNode, searchTreeRoot, -1);
+			this.searchTreeRoot = new Node();
+			this.searchTreeRoot.setState(currentNode);
+			this.searchTreeRoot.setParentNode(null);
+			this.searchTreeRoot.setScore(-1);
+			this.fringe.add(this.searchTreeRoot);
 		}else {
-			Node startNode = new Node(currentNode, searchTreeRoot, -1);
+			Node startNode = new Node();
+			startNode.setState(currentNode);
+			startNode.setParentNode(null);
+			startNode.setScore(-1);
 			this.fringe.add(startNode);
 			this.searchTreeRoot = startNode;
 		}
@@ -47,7 +57,7 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 		return bestMove(searchTR);
 	} 
 	
-	private void expandTree(List<Node> fringe, int playTime) {
+	private void expandTree(ArrayList<Node> fringe, int playTime) {
 		
 		long endTime = System.currentTimeMillis()+(60 * playTime -5);
 		while(System.currentTimeMillis() < endTime && !fringe.isEmpty()) {
@@ -69,9 +79,9 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 	private IMove bestMove(Node node) {
 		
 		int maxScore = 0;
-		List<ActionNodePair> actionList = node.getActionList();
+		ArrayList<ActionNodePair> actionList = node.getActionList();
 
-		if(actionList.isEmpty()) { System.out.println("Emty actionlist");}
+
 			ActionNodePair actionNode = actionList.remove(actionList.size()-1);
 			IMove bestAction = actionNode.getAction();
 			
@@ -114,34 +124,43 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 	 * @param node
 	 * @return
 	 */
-	private List<Node> expand(Node node) {
+	private ArrayList<Node> expand(Node node) {
 		
-		List<Node> nodeList				= new ArrayList<Node>();
-		List<ActionNodePair> actionList	= new ArrayList<ActionNodePair>();
-		
+		ArrayList<Node> nodeList				= new ArrayList<Node>();
+		ArrayList<ActionNodePair> actionList	= new ArrayList<ActionNodePair>();
+		Node childNode = null;
 		try {
 			IMove[][] moves = game.getLegalMoves(node.getState());
-			for (IMove[] mp : moves) {
+			List<IMove[]> cmoves = game.getCombinedMoves(node.getState());
+			
+			for (IMove[] mp : cmoves) {
 				
 				IMove[] singleMove = new IMove[1];
 				singleMove[0] = mp[playerNumber];
 				
 				IGameNode newState	= game.getNextNode(node.getState(), singleMove);
-				Node childNode		= new Node(newState, node, -1); 
+				childNode		= new Node();
+				childNode.setState(newState);
+				childNode.setParentNode(null);
+				childNode.setScore(-1);
 
 				if(newState.isTerminal()) { 
 					childNode.setScore(game.getGoalValues(newState)[playerNumber]);
 				}
 				
 				nodeList.add(childNode);
-				actionList.add(new ActionNodePair(singleMove[0], childNode));
+				ActionNodePair newACP = new ActionNodePair();
+				newACP.setAction(singleMove[0]);
+				newACP.setNode(childNode);
+				actionList.add(newACP);
 			}	
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		node.addActionList(actionList);
+		//node.getActionList().add(new ActionNodePair(null,null));
+		node.setActionList(actionList);
 		
 		return nodeList;
 	}

@@ -1,88 +1,27 @@
 package is.ru.gapl.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
+
 
 import org.eclipse.palamedes.gdl.core.model.IGameNode;
 
-public class Node {
+public class Node implements Serializable {
 
+	private static final long serialVersionUID = -5235334727724273744L;
 	private IGameNode state;
 	private Node parentNode;
-	private List<ActionNodePair> actionList;
+	private ArrayList<ActionNodePair> actionList;
 	private int score;
 	
-	public Node(IGameNode state, Node parentNode, int score) {
-		
-		super();
-		this.state		= state;
-		this.parentNode = parentNode;
-		this.actionList = new ArrayList<ActionNodePair>();
-		this.score		= score;
-	}
-	
-	/**
-	 * @param state
-	 * @param parentNode
-	 * @param actionCollection
-	 */
-	public Node(IGameNode state, Node parentNode,
-			List<ActionNodePair> actionList, int score) {
-		
-		super();
-		this.state		= state;
-		this.parentNode = parentNode;
-		this.actionList = actionList;
-		this.score		= score;
+	public Node() {
 	}
 
 	/*************************** GETTER / SETTER *******************************/
 	
-	/**
-	 * @return the state
-	 */
-	public IGameNode getState() {
-		return state;
-	}
-
-	/**
-	 * @param state the state to set
-	 */
-	public void setState(IGameNode state) {
-		this.state = state;
-	}
-
-	/**
-	 * @return the parentNode
-	 */
-	public Node getParentNode() {
-		return parentNode;
-	}
-
-	/**
-	 * @param parentNode the parentNode to set
-	 */
-	public void setParentNode(Node parentNode) {
-		this.parentNode = parentNode;
-	}
-
-	/**
-	 * @return the actionList
-	 */
-	public List<ActionNodePair> getActionList() {
-		return actionList;
-	}
-
-	public void addActionList(List<ActionNodePair> actionList) {
-		this.actionList.addAll(actionList);
-	}
 	
-	/**
-	 * @return the score
-	 */
-	public int getScore() {
-		return score;
-	}
 
 	/**
 	 * @param score the score to set
@@ -91,9 +30,76 @@ public class Node {
 		this.score = score;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
+	public IGameNode getState() {
+		return state;
+	}
+
+	public void setState(IGameNode state) {
+		this.state = state;
+	}
+
+	public Node getParentNode() {
+		return parentNode;
+	}
+
+	public void setParentNode(Node parentNode) {
+		this.parentNode = parentNode;
+	}
+
+	public ArrayList<ActionNodePair> getActionList() {
+		return actionList;
+	}
+
+	public void setActionList(ArrayList<ActionNodePair> actionList) {
+		this.actionList = actionList;
+	}
+
+	public int getScore() {
+		return score;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((actionList == null) ? 0 : actionList.hashCode());
+		result = prime * result
+				+ ((parentNode == null) ? 0 : parentNode.hashCode());
+		result = prime * result + score;
+		result = prime * result + ((state == null) ? 0 : state.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof Node))
+			return false;
+		Node other = (Node) obj;
+		if (actionList == null) {
+			if (other.actionList != null)
+				return false;
+		} else if (!actionList.equals(other.actionList))
+			return false;
+		if (parentNode == null) {
+			if (other.parentNode != null)
+				return false;
+		} else if (!parentNode.equals(other.parentNode))
+			return false;
+		if (score != other.score)
+			return false;
+		if (state == null) {
+			if (other.state != null)
+				return false;
+		} else if (!state.equals(other.state))
+			return false;
+		return true;
+	}
+
 	@Override
 	public String toString() {
 		return "Node [state=" + state + ", parentNode=" + parentNode
