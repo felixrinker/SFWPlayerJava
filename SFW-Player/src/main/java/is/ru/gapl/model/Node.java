@@ -9,6 +9,7 @@ public class Node {
 	private IGameNode state;
 	private Node parentNode;
 	private List<ActionNodePair> actionList;
+	private int score;
 	
 	/**
 	 * @param state
@@ -16,12 +17,13 @@ public class Node {
 	 * @param actionList
 	 */
 	public Node(IGameNode state, Node parentNode,
-			List<ActionNodePair> actionList) {
+			List<ActionNodePair> actionList, int score) {
 		
 		super();
-		this.state = state;
+		this.state		= state;
 		this.parentNode = parentNode;
 		this.actionList = actionList;
+		this.score		= score;
 	}
 
 	/*************************** GETTER / SETTER *******************************/
@@ -67,6 +69,20 @@ public class Node {
 	public void setActionList(List<ActionNodePair> actionList) {
 		this.actionList = actionList;
 	}
+	
+	/**
+	 * @return the score
+	 */
+	public int getScore() {
+		return score;
+	}
+
+	/**
+	 * @param score the score to set
+	 */
+	public void setScore(int score) {
+		this.score = score;
+	}
 
 	/*************************** TO STRING *******************************/
 	
@@ -76,6 +92,6 @@ public class Node {
 	@Override
 	public String toString() {
 		return "Node [state=" + state + ", parentNode=" + parentNode
-				+ ", actionList=" + actionList + "]";
+				+ ", actionList=" + actionList + ", score=" + score + "]";
 	}
 }
