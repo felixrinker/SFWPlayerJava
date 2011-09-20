@@ -37,12 +37,22 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 		IMove[] previousMoves = currentNode.getMoves();
 		if(previousMoves != null) {
 			
-			this.searchTreeRoot = new Node();
-			this.searchTreeRoot.setState(currentNode.getState());
-			this.searchTreeRoot.setParentNode(null);
-			this.searchTreeRoot.setScore(-1);
-			this.fringe.add(this.searchTreeRoot);
+			Node node = nodeCache.get(currentNode.getState());
+			
+			// if there already exists a node in the cache, use it!
+			if( node != null) {
+				this.searchTreeRoot = node;
+				
+			}else {
+				this.searchTreeRoot = new Node();
+				this.searchTreeRoot.setState(currentNode.getState());
+				this.searchTreeRoot.setParentNode(null);
+				this.searchTreeRoot.setScore(-1);
+				this.fringe.add(this.searchTreeRoot);
+			}	
 		}else {
+			
+			// first time we need a new node 
 			Node startNode = new Node();
 			startNode.setState(currentNode.getState());
 			startNode.setParentNode(null);
@@ -55,12 +65,28 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 		return solve(searchTreeRoot);
 	}
 
+	/**
+	 * 
+	 * @param searchTR
+	 * @return
+	 */
 	private IMove solve(Node searchTR) {
 		
-		expandTree(fringe, match.getPlayTime());
+		// if the node exists in the cache,
+		// but isnt in the fringe anymore, 
+		// the node is already expanded
+		if(!fringe.contains(searchTR)) {
+			expandTree(fringe, match.getPlayTime());
+		}
 		return bestMove(searchTR);
 	} 
 	
+	
+	/**
+	 * 
+	 * @param fringe
+	 * @param playTime
+	 */
 	private void expandTree(ArrayList<Node> fringe, int playTime) {
 		
 		long endTime = System.currentTimeMillis()+ (1000 * playTime -2500);
@@ -144,6 +170,7 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 			
 				IGameState newState	= game.getReasoner().getNextState(node.getState(), singleMove);
 				
+				// check if there exists a node for this state
 				if(!nodeCache.containsKey(newState)) {
 					Node childNode		= new Node();
 					childNode.setState(newState);
@@ -162,20 +189,19 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 					
 					nodeCache.put(newState, childNode);
 				}else {
+					
+					// use the existing node and add it to the actionList
 					ActionNodePair newACP = new ActionNodePair();
 					newACP.setAction(singleMove[0]);
 					newACP.setNode(nodeCache.get(newState));
 					actionList.add(newACP);
 				}
-				
-				
 			}	
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		//node.getActionList().add(new ActionNodePair(null,null));
 		node.setActionList(actionList);
 		
 		return nodeList;
