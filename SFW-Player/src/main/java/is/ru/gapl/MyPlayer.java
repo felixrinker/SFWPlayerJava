@@ -2,6 +2,7 @@ package is.ru.gapl;
 
 import org.eclipse.palamedes.gdl.core.simulation.StrategyFactory;
 
+import is.ru.gapl.strategy.ExhaustiveSearchStrategy;
 import is.ru.gapl.strategy.MyRandomStrategy;
 
 import java.io.IOException;
@@ -22,6 +23,11 @@ public final class MyPlayer extends Player {
 							"MyRandomStrategy",
 							MyRandomStrategy.class.getCanonicalName(),
             				"Simulates games and chooses the best path." );
+		
+		StrategyFactory.getInstance().addDescription(
+				"ExhaustiveSearchStrategy",
+				ExhaustiveSearchStrategy.class.getCanonicalName(),
+				"Simulates games ExhaustiveSearchStrategy." );
 	}
 	
 	
@@ -64,7 +70,7 @@ public final class MyPlayer extends Player {
 
         
         /** XXX: If you implement another strategy here is the place to instantiate it */
-        IStrategy strategy = StrategyFactory.getInstance().createStrategy("MyRandomStrategy");
+        IStrategy strategy = StrategyFactory.getInstance().createStrategy("ExhaustiveSearchStrategy");
 
         System.out.println( "MyPlayer created the strategy "      +
                             strategy.getClass().getSimpleName() +

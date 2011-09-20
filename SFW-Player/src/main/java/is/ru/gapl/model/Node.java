@@ -1,5 +1,6 @@
 package is.ru.gapl.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.palamedes.gdl.core.model.IGameNode;
@@ -11,10 +12,19 @@ public class Node {
 	private List<ActionNodePair> actionList;
 	private int score;
 	
+	public Node(IGameNode state, Node parentNode, int score) {
+		
+		super();
+		this.state		= state;
+		this.parentNode = parentNode;
+		this.actionList = new ArrayList<ActionNodePair>();
+		this.score		= score;
+	}
+	
 	/**
 	 * @param state
 	 * @param parentNode
-	 * @param actionList
+	 * @param actionCollection
 	 */
 	public Node(IGameNode state, Node parentNode,
 			List<ActionNodePair> actionList, int score) {
@@ -63,11 +73,8 @@ public class Node {
 		return actionList;
 	}
 
-	/**
-	 * @param actionList the actionList to set
-	 */
-	public void setActionList(List<ActionNodePair> actionList) {
-		this.actionList = actionList;
+	public void addActionList(List<ActionNodePair> actionList) {
+		this.actionList.addAll(actionList);
 	}
 	
 	/**
@@ -84,8 +91,6 @@ public class Node {
 		this.score = score;
 	}
 
-	/*************************** TO STRING *******************************/
-	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
@@ -94,4 +99,8 @@ public class Node {
 		return "Node [state=" + state + ", parentNode=" + parentNode
 				+ ", actionList=" + actionList + ", score=" + score + "]";
 	}
+
+	/*************************** TO STRING *******************************/
+	
+	
 }
