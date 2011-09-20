@@ -62,12 +62,12 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 	
 	private void expandTree(ArrayList<Node> fringe, int playTime) {
 		
-		long endTime = System.currentTimeMillis()+(60 * playTime -5);
+		long endTime = System.currentTimeMillis()+ (1000 * playTime -2500);
+
 		while(System.currentTimeMillis() < endTime && !fringe.isEmpty()) {
 			
 			Node node = fringe.remove(fringe.size()-1);
 			if(node.getScore() == -1) {
-				
 				List<Node> expandNodes = expand(node);
 				fringe.addAll(expandNodes);
 			}
@@ -85,8 +85,9 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 		ArrayList<ActionNodePair> actionList = node.getActionList();
 
 
-			ActionNodePair actionNode = actionList.remove(actionList.size()-1);
+			ActionNodePair actionNode = actionList.remove(0);
 			IMove bestAction = actionNode.getAction();
+            maxScore = maxScore(actionNode.getNode());
 			
 			for(ActionNodePair aNP : actionList) {
 				
