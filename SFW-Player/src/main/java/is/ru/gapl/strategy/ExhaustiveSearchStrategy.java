@@ -85,7 +85,7 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 		ArrayList<ActionNodePair> actionList = node.getActionList();
 
 
-			ActionNodePair actionNode = actionList.remove(0);
+			ActionNodePair actionNode = actionList.get(0);
 			IMove bestAction = actionNode.getAction();
             maxScore = maxScore(actionNode.getNode());
 			
