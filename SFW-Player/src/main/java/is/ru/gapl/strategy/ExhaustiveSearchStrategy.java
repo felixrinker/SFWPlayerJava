@@ -36,20 +36,12 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 		
 		IMove[] previousMoves = currentNode.getMoves();
 		if(previousMoves != null) {
-			
-			Node node = nodeCache.get(currentNode.getState());
-			
-			// if there already exists a node in the cache, use it!
-			if( node != null) {
-				this.searchTreeRoot = node;
-				
-			}else {
 				this.searchTreeRoot = new Node();
 				this.searchTreeRoot.setState(currentNode.getState());
 				this.searchTreeRoot.setParentNode(null);
 				this.searchTreeRoot.setScore(-1);
 				this.fringe.add(this.searchTreeRoot);
-			}	
+				
 		}else {
 			
 			// first time we need a new node 
@@ -72,12 +64,7 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 	 */
 	private IMove solve(Node searchTR) {
 		
-		// if the node exists in the cache,
-		// but isnt in the fringe anymore, 
-		// the node is already expanded
-		if(!fringe.contains(searchTR)) {
-			expandTree(fringe, match.getPlayTime());
-		}
+		expandTree(fringe, match.getPlayTime());
 		return bestMove(searchTR);
 	} 
 	
@@ -93,10 +80,11 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 
 		while(System.currentTimeMillis() < endTime && !fringe.isEmpty()) {
 			
-			Node node = fringe.remove(fringe.size()-1);
+			// take the head
+			Node node = fringe.remove(0);
 			if(node.getScore() == -1) {
-				List<Node> expandNodes = expand(node);
-				fringe.addAll(expandNodes);
+				List<Node> expandedNodes = expand(node);
+				fringe.addAll(expandedNodes);
 			}
 		}
 	}
@@ -111,10 +99,9 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 		int maxScore = 0;
 		ArrayList<ActionNodePair> actionList = node.getActionList();
 
-
-			ActionNodePair actionNode = actionList.remove(0);
-			IMove bestAction = actionNode.getAction();
-            maxScore = maxScore(actionNode.getNode());
+		ActionNodePair actionNode = actionList.remove(0);
+		IMove bestAction = actionNode.getAction();
+        maxScore		 = maxScore(actionNode.getNode());
 			
 			for(ActionNodePair aNP : actionList) {
 				
@@ -136,11 +123,11 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 	 */
 	private int maxScore(Node node) {
 		
-		if (node.getScore() > -1) { return node.getScore();}
-		if(node.getActionList().isEmpty()) { return -1;}
+		if( node.getScore() > -1 ) { return node.getScore(); }
+		if( node.getActionList().isEmpty() ) { return -1; }
 		
 		int maxScore = 0;
-		for(ActionNodePair aNP : node.getActionList()) {
+		for( ActionNodePair aNP : node.getActionList() ) {
 			
 			int score = maxScore(aNP.getNode());
 			if(score == 100 || score == -1) { return score;}
