@@ -34,7 +34,7 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 	@Override
 	public IMove getMove(IGameNode currentNode) {
 		
-		IMove[] previousMoves = currentNode.getMoves();
+		/*IMove[] previousMoves = currentNode.getMoves();
 		if(previousMoves != null) {
 			
 			this.searchTreeRoot = new Node();
@@ -50,9 +50,19 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 			this.fringe.add(startNode);
 			this.searchTreeRoot = startNode;
 			this.roleName = game.getRoleNames()[playerNumber];
-		}
-		// TODO Auto-generated method stub
-		return solve(searchTreeRoot);
+		}*/
+        IGameState currentState = currentNode.getState();
+        this.roleName = game.getRoleNames()[playerNumber];
+        if(!nodeCache.containsKey(currentState)) {
+            this.searchTreeRoot = new Node();
+			this.searchTreeRoot.setState(currentNode.getState());
+			this.searchTreeRoot.setParentNode(null);
+			this.searchTreeRoot.setScore(-1);
+			this.fringe.add(this.searchTreeRoot);
+        } else {
+            this.searchTreeRoot = nodeCache.get(currentState);
+        }
+        return solve(searchTreeRoot);
 	}
 
 	private IMove solve(Node searchTR) {
@@ -67,7 +77,7 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 
 		while(System.currentTimeMillis() < endTime && !fringe.isEmpty()) {
 			
-			Node node = fringe.remove(fringe.size()-1);
+			Node node = fringe.remove(0);
 			if(node.getScore() == -1) {
 				List<Node> expandNodes = expand(node);
 				fringe.addAll(expandNodes);
@@ -82,24 +92,21 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 	 */
 	private IMove bestMove(Node node) {
 		
-		int maxScore = 0;
 		ArrayList<ActionNodePair> actionList = node.getActionList();
 
-
-			ActionNodePair actionNode = actionList.get(0);
-			IMove bestAction = actionNode.getAction();
-            maxScore = maxScore(actionNode.getNode());
-			
-			for(ActionNodePair aNP : actionList) {
-				
-				int score = maxScore(aNP.getNode());
-				if(score == 100) { return aNP.getAction(); }
-				if(score > maxScore) { 
-					maxScore = score;
-					bestAction = aNP.getAction();
-				}
-			}
-		
+		int maxScore = 0;
+        IMove bestAction = actionList.get(0).getAction();
+        
+        for(ActionNodePair aNP : actionList) {
+            
+            int score = maxScore(aNP.getNode());
+            if(score == 100) { return aNP.getAction(); }
+            if(score > maxScore) { 
+                maxScore = score;
+                bestAction = aNP.getAction();
+            }
+        }
+    
 		return bestAction;
 	}
 	
@@ -147,23 +154,24 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 				if(!nodeCache.containsKey(newState)) {
 					Node childNode		= new Node();
 					childNode.setState(newState);
-					childNode.setParentNode(null);
-					childNode.setScore(-1);
+					childNode.setParentNode(node);
 
 					if(newState.isTerminal()) { 
 						childNode.setScore(game.getReasoner().getGoalValue(roleName, newState));
-					}
+					} else {
+                        childNode.setScore(-1);
+                    }
 					
 					nodeList.add(childNode);
 					ActionNodePair newACP = new ActionNodePair();
-					newACP.setAction(singleMove[0]);
+					newACP.setAction(move);
 					newACP.setNode(childNode);
 					actionList.add(newACP);
 					
 					nodeCache.put(newState, childNode);
 				}else {
 					ActionNodePair newACP = new ActionNodePair();
-					newACP.setAction(singleMove[0]);
+					newACP.setAction(move);
 					newACP.setNode(nodeCache.get(newState));
 					actionList.add(newACP);
 				}
