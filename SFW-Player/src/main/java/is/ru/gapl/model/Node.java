@@ -2,11 +2,7 @@ package is.ru.gapl.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 
-
-import org.eclipse.palamedes.gdl.core.model.IGameNode;
 import org.eclipse.palamedes.gdl.core.model.IGameState;
 
 public class Node implements Serializable {
@@ -16,6 +12,7 @@ public class Node implements Serializable {
 	private Node parentNode;
 	private ArrayList<ActionNodePair> actionList;
 	private int score;
+	private boolean isExpanded;
 	
 	public Node() {
         actionList = new ArrayList<ActionNodePair>();
@@ -72,6 +69,16 @@ public class Node implements Serializable {
 		result = prime * result + ((state == null) ? 0 : state.hashCode());
 		return result;
 	}
+	
+	
+
+	public boolean isExpanded() {
+		return isExpanded;
+	}
+
+	public void setExpanded(boolean isExpanded) {
+		this.isExpanded = isExpanded;
+	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -101,7 +108,7 @@ public class Node implements Serializable {
 			return false;
 		return true;
 	}
-
+	
 	@Override
 	public String toString() {
 		return "Node [state=" + state + ", parentNode=" + parentNode
