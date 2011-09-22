@@ -101,15 +101,20 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 
 		ActionNodePair actionNode = actionList.remove(0);
 		IMove bestAction = actionNode.getAction();
-        maxScore		 = maxScore(actionNode.getNode());
+        maxScore		 = 0;
 			
 			for(ActionNodePair aNP : actionList) {
 				
-				int score = maxScore(aNP.getNode());
-				if(score == 100) { return aNP.getAction(); }
-				if(score > maxScore) { 
-					maxScore = score;
-					bestAction = aNP.getAction();
+				long endTime = System.currentTimeMillis()+ 2500;
+				while(System.currentTimeMillis() < endTime) {
+				
+					int depth = 0;
+					int score = maxScore(aNP.getNode(), depth, 0);
+					if(score == 100) { return aNP.getAction(); }
+					if(score > maxScore) { 
+						maxScore = score;
+						bestAction = aNP.getAction();
+					}
 				}
 			}
 		
@@ -121,18 +126,21 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 	 * @param node
 	 * @return
 	 */
-	private int maxScore(Node node) {
+	private int maxScore( Node node, int depth, int count ) {
 		
 		if( node.getScore() > -1 ) { return node.getScore(); }
 		if( node.getActionList().isEmpty() ) { return -1; }
+		if( count == depth ) { return -1; }
 		
 		int maxScore = 0;
 		for( ActionNodePair aNP : node.getActionList() ) {
 			
-			int score = maxScore(aNP.getNode());
+			int score = maxScore(aNP.getNode(), depth, count);
 			if(score == 100 || score == -1) { return score;}
 			if(score > maxScore) { maxScore = score;}
 		}
+		//increase depth counter
+		count++;
 		return maxScore;
 	}
 
