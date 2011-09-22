@@ -105,16 +105,17 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 			
 			for(ActionNodePair aNP : actionList) {
 				
+				int depth = 0;
 				long endTime = System.currentTimeMillis()+ 2500;
 				while(System.currentTimeMillis() < endTime) {
-				
-					int depth = 0;
+					
 					int score = maxScore(aNP.getNode(), depth, 0);
 					if(score == 100) { return aNP.getAction(); }
 					if(score > maxScore) { 
 						maxScore = score;
 						bestAction = aNP.getAction();
 					}
+					depth++;
 				}
 			}
 		
