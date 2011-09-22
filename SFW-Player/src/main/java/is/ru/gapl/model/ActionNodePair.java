@@ -6,6 +6,7 @@ import org.eclipse.palamedes.gdl.core.model.IMove;
 
 public class ActionNodePair implements Serializable{
 
+	private static final long serialVersionUID = 1L;
 	private IMove action;
 	private Node node;
 	
@@ -87,6 +88,9 @@ public class ActionNodePair implements Serializable{
 			return false;
 		return true;
 	}
-	
-	
+
+	@Override
+	public String toString() {
+		return "ActionNodePair";
+	}
 }

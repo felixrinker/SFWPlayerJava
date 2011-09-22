@@ -65,29 +65,11 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 	private IMove solve(Node searchTR) {
 		
 		expandTree(fringe, match.getPlayTime());
+		
+	//	this.fringe = new ArrayList<Node>();
+		
 		return bestMove(searchTR);
 	} 
-	
-	
-	/**
-	 * 
-	 * @param fringe
-	 * @param playTime
-	 */
-	private void expandTree(ArrayList<Node> fringe, int playTime) {
-		
-		long endTime = System.currentTimeMillis()+ (1000 * playTime -2500);
-
-		while(System.currentTimeMillis() < endTime && !fringe.isEmpty()) {
-			
-			// take the head
-			Node node = fringe.remove(0);
-			if(node.getScore() == -1) {
-				List<Node> expandedNodes = expand(node);
-				fringe.addAll(expandedNodes);
-			}
-		}
-	}
 
 	/**
 	 * 
@@ -99,52 +81,83 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 		int maxScore = 0;
 		ArrayList<ActionNodePair> actionList = node.getActionList();
 
-		ActionNodePair actionNode = actionList.remove(0);
+		ActionNodePair actionNode = actionList.get(0);
 		IMove bestAction = actionNode.getAction();
-        maxScore		 = 0;
+			
+		int depth = 0;
+		long endTime = System.currentTimeMillis()+ 4950;
+		while(System.currentTimeMillis() < endTime) {
 			
 			for(ActionNodePair aNP : actionList) {
 				
-				int depth = 0;
-				long endTime = System.currentTimeMillis()+ 2500;
-				while(System.currentTimeMillis() < endTime) {
-					
-					int score = maxScore(aNP.getNode(), depth, 0);
-					if(score == 100) { return aNP.getAction(); }
-					if(score > maxScore) { 
-						maxScore = score;
-						bestAction = aNP.getAction();
-					}
-					depth++;
+				int score = maxScore(aNP.getNode(), depth, 1, endTime);
+				if(score == 100) { return aNP.getAction(); }
+				if(score > maxScore) { 
+					maxScore = score;
+					bestAction = aNP.getAction();	
 				}
 			}
-		
+			depth++;
+			
+		}	
+		System.out.println("depth:"+depth);
+		System.out.println("MaxScore:"+maxScore);	
 		return bestAction;
 	}
 	
 	/**
 	 * 
 	 * @param node
+	 * @param endTime 
 	 * @return
 	 */
-	private int maxScore( Node node, int depth, int count ) {
+	private int maxScore( Node node, int depth, int count, long endTime ) {
 		
+		if(System.currentTimeMillis() >= endTime) { return -1; }
 		if( node.getScore() > -1 ) { return node.getScore(); }
 		if( node.getActionList().isEmpty() ) { return -1; }
-		if( count == depth ) { return -1; }
+		if( count >= depth ) { return -1; }
 		
 		int maxScore = 0;
+		//increase depth counter
+		count++;
 		for( ActionNodePair aNP : node.getActionList() ) {
 			
-			int score = maxScore(aNP.getNode(), depth, count);
+			int score = maxScore(aNP.getNode(), depth, count, endTime);
 			if(score == 100 || score == -1) { return score;}
 			if(score > maxScore) { maxScore = score;}
 		}
-		//increase depth counter
-		count++;
+		
 		return maxScore;
 	}
 
+	/**
+	 * 
+	 * @param fringe
+	 * @param playTime
+	 */
+	private void expandTree(ArrayList<Node> fringe, int playTime) {
+		
+		System.out.println("Node: "+fringe.size());
+		
+		long endTime = System.currentTimeMillis()+ (1000 * playTime -5000);
+
+		while(System.currentTimeMillis() < endTime && !fringe.isEmpty()) {
+			
+			// take the head
+			Node node = fringe.remove(0);
+			if(node.getScore() == -1) {
+				List<Node> expandedNodes = expand(node);
+				fringe.addAll(expandedNodes);
+				node.setExpanded(true);
+				System.out.println("Fringe Size: "+fringe.size());
+			}
+			
+		}
+		
+		
+	}
+	
 	/**
 	 * 
 	 * 
@@ -168,13 +181,14 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 				
 				// check if there exists a node for this state
 				if(!nodeCache.containsKey(newState)) {
-					Node childNode		= new Node();
+					Node childNode	= new Node();
 					childNode.setState(newState);
 					childNode.setParentNode(null);
 					childNode.setScore(-1);
 
 					if(newState.isTerminal()) { 
 						childNode.setScore(game.getReasoner().getGoalValue(roleName, newState));
+						System.out.println("Terminal");
 					}
 					
 					nodeList.add(childNode);
