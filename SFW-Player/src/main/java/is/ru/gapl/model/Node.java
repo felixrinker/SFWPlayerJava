@@ -17,6 +17,7 @@ public class Node implements Serializable {
 	
 	public Node() {
         actionList = new ArrayList<ActionNodePair>();
+        this.isExpanded = false;
 	}
 
 	/*************************** GETTER / SETTER *******************************/
