@@ -33,7 +33,7 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 		this.searchTreeRoot = null;
 		this.fringe			= new ArrayList<Node>();
 		this.nodeCache		= new HashMap<IGameState, Node>();
-		
+		//this.searchAlog		= new DepthFirst();
 		this.searchAlog		= new IterativeDeepening();
 	}
 	
@@ -72,7 +72,7 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 		
 		expandTree(fringe, match.getPlayTime());
 		
-	//	this.fringe = new ArrayList<Node>();
+		this.fringe = new ArrayList<Node>();
 		
 		return searchAlog.bestMove(searchTR);
 	} 
@@ -88,7 +88,8 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 		
 		System.out.println("Node: "+fringe.size());
 		
-		long endTime = System.currentTimeMillis()+ (1000 * playTime -5000);
+		long startTime = System.currentTimeMillis();
+		long endTime = startTime + (1000 * playTime -5000);
 
 		while(System.currentTimeMillis() < endTime && !fringe.isEmpty()) {
 			
@@ -98,10 +99,10 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 				List<Node> expandedNodes = expand(node);
 				fringe.addAll(expandedNodes);
 				node.setExpanded(true);
-				System.out.println("Fringe Size: "+fringe.size());
 			}
 			
 		}
+		System.out.println("Used time: "+(System.currentTimeMillis()-startTime));
 		
 		
 	}
@@ -139,20 +140,29 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 						System.out.println("Terminal");
 					}
 					
-					nodeList.add(childNode);
+					
 					ActionNodePair newACP = new ActionNodePair();
 					newACP.setAction(singleMove[0]);
 					newACP.setNode(childNode);
 					actionList.add(newACP);
 					
+					System.out.println("CREATE NEW NODE");
+					
 					nodeCache.put(newState, childNode);
+					nodeList.add(childNode);
 				}else {
 					
 					// use the existing node and add it to the actionList
+					Node cacheNode = nodeCache.get(newState);
 					ActionNodePair newACP = new ActionNodePair();
 					newACP.setAction(singleMove[0]);
-					newACP.setNode(nodeCache.get(newState));
+					newACP.setNode(cacheNode);
 					actionList.add(newACP);
+					System.out.println("USE CACHE NODE");
+					if(!cacheNode.isExpanded()){
+						System.out.println("NODE IS EXP");
+						nodeList.add(cacheNode);
+					}
 				}
 			}	
 		} catch (InterruptedException e) {
