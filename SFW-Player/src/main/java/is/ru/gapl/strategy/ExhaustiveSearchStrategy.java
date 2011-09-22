@@ -34,7 +34,7 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 	@Override
 	public IMove getMove(IGameNode currentNode) {
 		
-		/*IMove[] previousMoves = currentNode.getMoves();
+		IMove[] previousMoves = currentNode.getMoves();
 		if(previousMoves != null) {
 			
 			Node node = nodeCache.get(currentNode.getState());
@@ -60,18 +60,7 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 			this.fringe.add(startNode);
 			this.searchTreeRoot = startNode;
 			this.roleName = game.getRoleNames()[playerNumber];
-		}*/
-        IGameState currentState = currentNode.getState();
-        this.roleName = game.getRoleNames()[playerNumber];
-        if(!nodeCache.containsKey(currentState)) {
-            this.searchTreeRoot = new Node();
-			this.searchTreeRoot.setState(currentNode.getState());
-			this.searchTreeRoot.setParentNode(null);
-			this.searchTreeRoot.setScore(-1);
-			this.fringe.add(this.searchTreeRoot);
-        } else {
-            this.searchTreeRoot = nodeCache.get(currentState);
-        }
+		}
         return solve(searchTreeRoot);
 	}
 
@@ -82,12 +71,8 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 	 */
 	private IMove solve(Node searchTR) {
 		
-		// if the node exists in the cache,
-		// but isnt in the fringe anymore, 
-		// the node is already expanded
-		if(!fringe.contains(searchTR)) {
-			expandTree(fringe, match.getPlayTime());
-		}
+        // expand the nodes in the fringe
+        expandTree(fringe, match.getPlayTime());
 		return bestMove(searchTR);
 	} 
 	
