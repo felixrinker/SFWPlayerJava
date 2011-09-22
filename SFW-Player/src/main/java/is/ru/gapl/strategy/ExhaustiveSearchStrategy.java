@@ -2,6 +2,9 @@ package is.ru.gapl.strategy;
 
 import is.ru.gapl.model.ActionNodePair;
 import is.ru.gapl.model.Node;
+import is.ru.gapl.search.DepthFirst;
+import is.ru.gapl.search.ISearch;
+import is.ru.gapl.search.IterativeDeepening;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,6 +21,7 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 	private ArrayList<Node> fringe;
 	private String roleName;
 	private HashMap<IGameState, Node> nodeCache;
+	private ISearch searchAlog;
 	
     /**
 	 * @param searchTreeRoot
@@ -29,6 +33,8 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 		this.searchTreeRoot = null;
 		this.fringe			= new ArrayList<Node>();
 		this.nodeCache		= new HashMap<IGameState, Node>();
+		
+		this.searchAlog		= new IterativeDeepening();
 	}
 	
 	@Override
@@ -68,68 +74,10 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 		
 	//	this.fringe = new ArrayList<Node>();
 		
-		return bestMove(searchTR);
+		return searchAlog.bestMove(searchTR);
 	} 
 
-	/**
-	 * 
-	 * @param node
-	 * @return
-	 */
-	private IMove bestMove(Node node) {
-		
-		int maxScore = 0;
-		ArrayList<ActionNodePair> actionList = node.getActionList();
-
-		ActionNodePair actionNode = actionList.get(0);
-		IMove bestAction = actionNode.getAction();
-			
-		int depth = 0;
-		long endTime = System.currentTimeMillis()+ 4950;
-		while(System.currentTimeMillis() < endTime) {
-			
-			for(ActionNodePair aNP : actionList) {
-				
-				int score = maxScore(aNP.getNode(), depth, 1, endTime);
-				if(score == 100) { return aNP.getAction(); }
-				if(score > maxScore) { 
-					maxScore = score;
-					bestAction = aNP.getAction();	
-				}
-			}
-			depth++;
-			
-		}	
-		System.out.println("depth:"+depth);
-		System.out.println("MaxScore:"+maxScore);	
-		return bestAction;
-	}
 	
-	/**
-	 * 
-	 * @param node
-	 * @param endTime 
-	 * @return
-	 */
-	private int maxScore( Node node, int depth, int count, long endTime ) {
-		
-		if(System.currentTimeMillis() >= endTime) { return -1; }
-		if( node.getScore() > -1 ) { return node.getScore(); }
-		if( node.getActionList().isEmpty() ) { return -1; }
-		if( count >= depth ) { return -1; }
-		
-		int maxScore = 0;
-		//increase depth counter
-		count++;
-		for( ActionNodePair aNP : node.getActionList() ) {
-			
-			int score = maxScore(aNP.getNode(), depth, count, endTime);
-			if(score == 100 || score == -1) { return score;}
-			if(score > maxScore) { maxScore = score;}
-		}
-		
-		return maxScore;
-	}
 
 	/**
 	 * 
