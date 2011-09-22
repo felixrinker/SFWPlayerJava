@@ -13,6 +13,7 @@ public class Node implements Serializable {
 	private ArrayList<ActionNodePair> actionList;
 	private int score;
 	private boolean isExpanded;
+	private int depth;
 	
 	public Node() {
         actionList = new ArrayList<ActionNodePair>();
@@ -27,6 +28,14 @@ public class Node implements Serializable {
 	 */
 	public void setScore(int score) {
 		this.score = score;
+	}
+
+	public int getDepth() {
+		return depth;
+	}
+
+	public void setDepth(int depth) {
+		this.depth = depth;
 	}
 
 	public IGameState getState() {
