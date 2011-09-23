@@ -26,7 +26,7 @@ public class IterativeDeepening implements ISearch {
 		IMove bestAction = actionNode.getAction();
 			
 		int depth = 0;
-		long endTime = System.currentTimeMillis()+ 4950;
+		long endTime = System.currentTimeMillis()+ 8000;
 		while(System.currentTimeMillis() < endTime) {
 			
 			for(ActionNodePair aNP : actionList) {
