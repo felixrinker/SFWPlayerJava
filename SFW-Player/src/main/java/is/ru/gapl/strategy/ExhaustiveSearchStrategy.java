@@ -2,7 +2,7 @@ package is.ru.gapl.strategy;
 
 import is.ru.gapl.model.ActionNodePair;
 import is.ru.gapl.model.Node;
-import is.ru.gapl.search.DepthFirst;
+//import is.ru.gapl.search.DepthFirst;
 import is.ru.gapl.search.ISearch;
 import is.ru.gapl.search.IterativeDeepening;
 
@@ -41,11 +41,9 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 	public IMove getMove(IGameNode currentNode) {
 		
 		IMove[] previousMoves = currentNode.getMoves();
-		if(previousMoves != null) {
-				this.searchTreeRoot = new Node();
-				this.searchTreeRoot.setState(currentNode.getState());
-				this.searchTreeRoot.setParentNode(null);
-				this.searchTreeRoot.setScore(-1);
+		if(nodeCache.containsKey(currentNode)) {
+			this.searchTreeRoot = nodeCache.get(currentNode);
+				
 				this.fringe.add(this.searchTreeRoot);
 				
 		}else {
@@ -53,7 +51,7 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 			// first time we need a new node 
 			Node startNode = new Node();
 			startNode.setState(currentNode.getState());
-			startNode.setParentNode(null);
+			startNode.setNextStates(null);
 			startNode.setScore(-1);
 			this.fringe.add(startNode);
 			this.searchTreeRoot = startNode;
@@ -74,7 +72,7 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 		
 		this.fringe = new ArrayList<Node>();
 		
-		return searchAlog.bestMove(searchTR);
+		return searchAlog.bestMove(random, nodeCache, searchTR);
 	} 
 
 	
@@ -89,7 +87,7 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 		System.out.println("Node: "+fringe.size());
 		
 		long startTime = System.currentTimeMillis();
-		long endTime = startTime + (1000 * playTime -5000);
+		long endTime = startTime + (1000 * playTime -15000);
 
 		while(System.currentTimeMillis() < endTime && !fringe.isEmpty()) {
 			
@@ -116,7 +114,7 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 	private ArrayList<Node> expand(Node node) {
 		
 		ArrayList<Node> nodeList				= new ArrayList<Node>();
-		ArrayList<ActionNodePair> actionList	= new ArrayList<ActionNodePair>();
+		HashMap<IGameState, IMove> nextState			= new HashMap<IGameState, IMove>();
 		
 		try {
 			IMove[] moves = game.getReasoner().getLegalMoves(roleName, node.getState());
@@ -132,7 +130,7 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 				if(!nodeCache.containsKey(newState)) {
 					Node childNode	= new Node();
 					childNode.setState(newState);
-					childNode.setParentNode(null);
+					//childNode.setParentState(node.getState());
 					childNode.setScore(-1);
 
 					if(newState.isTerminal()) { 
@@ -140,27 +138,24 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 						System.out.println("Terminal");
 					}
 					
+				
 					
-					ActionNodePair newACP = new ActionNodePair();
-					newACP.setAction(singleMove[0]);
-					newACP.setNode(childNode);
-					actionList.add(newACP);
-					
-					System.out.println("CREATE NEW NODE");
+				//	System.out.println("CREATE NEW NODE");
 					
 					nodeCache.put(newState, childNode);
 					nodeList.add(childNode);
-				}else {
+					nextState.put(newState, singleMove[0]);
+				}
+				
+				else {
 					
 					// use the existing node and add it to the actionList
 					Node cacheNode = nodeCache.get(newState);
-					ActionNodePair newACP = new ActionNodePair();
-					newACP.setAction(singleMove[0]);
-					newACP.setNode(cacheNode);
-					actionList.add(newACP);
-					System.out.println("USE CACHE NODE");
-					if(!cacheNode.isExpanded()){
-						System.out.println("NODE IS EXP");
+					
+					nextState.put(cacheNode.getState(), singleMove[0]);
+					//System.out.println("USE CACHE NODE");
+				if(!cacheNode.isExpanded()){
+						//System.out.println("NODE IS EXP");
 						nodeList.add(cacheNode);
 					}
 				}
@@ -170,7 +165,7 @@ public class ExhaustiveSearchStrategy extends AbstractStrategy {
 			e.printStackTrace();
 		}
 		
-		node.setActionList(actionList);
+		node.setNextStates(nextState);
 		
 		return nodeList;
 	}
