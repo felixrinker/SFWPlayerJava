@@ -91,7 +91,7 @@ public class SinglePlayerExhaustiveSearchStrategy extends AbstractStrategy{
 		return bestMove;
 	}
 
-/*********************** PRIVATE METHODS *****************************/
+/*********************** PRIVATE METHODS **********************************/
 	
 	/**
 	 * 
@@ -107,7 +107,35 @@ public class SinglePlayerExhaustiveSearchStrategy extends AbstractStrategy{
 	 * 
 	 * @return
 	 */
-	protected boolean isTimeUp() {
+	
+/*********************** PUBLIC GETTER METHODS *****************************/	
+	public boolean isTimeUp() {
 		return System.currentTimeMillis() >= endTime;
+	}
+
+
+	public IReasoner getReasoner() {
+		return reasoner;
+	}
+
+	public String getRoleName() {
+		return roleName;
+	}
+
+	public long getEndTime() {
+		return endTime;
+	}
+
+
+	public void setEndTime(long endTime) {
+		this.endTime = endTime;
+	}
+
+	public long getStartTime() {
+		return startTime;
+	}
+
+	public void setBestMove(IMove bestMove) {
+		this.bestMove = bestMove;
 	}
 }
