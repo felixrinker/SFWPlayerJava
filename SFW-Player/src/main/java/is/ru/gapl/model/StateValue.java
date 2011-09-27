@@ -10,6 +10,7 @@ public class StateValue {
 
 	private int score;
 	private IMove bestMove;
+	private int depth;
 	
 	/**
 	 * Constructor for terminal state
@@ -19,6 +20,7 @@ public class StateValue {
 	public StateValue(int score) {
 		super();
 		this.score = score;
+		this.depth = 0;
 		this.bestMove = null;
 	}
 	
@@ -31,6 +33,20 @@ public class StateValue {
 	public StateValue(int score, IMove bestMove) {
 		super();
 		this.score = score;
+		this.depth = 0;
+		this.bestMove = bestMove;
+	}
+	
+	/**
+	 * 
+	 * @param score
+	 * @param depth
+	 * @param bestMove
+	 */
+	public StateValue(int score, int depth, IMove bestMove) {
+		super();
+		this.score = score;
+		this.depth = depth;
 		this.bestMove = bestMove;
 	}
 
@@ -42,6 +58,14 @@ public class StateValue {
 
 	public void setScore(int score) {
 		this.score = score;
+	}
+
+	public int getDepth() {
+		return depth;
+	}
+
+	public void setDepth(int depth) {
+		this.depth = depth;
 	}
 
 	public IMove getBestMove() {
