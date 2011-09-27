@@ -12,7 +12,7 @@ import org.eclipse.palamedes.gdl.core.model.IReasoner;
 import org.eclipse.palamedes.gdl.core.simulation.Match;
 import org.eclipse.palamedes.gdl.core.simulation.strategies.AbstractStrategy;
 
-public class SinglePlayerExhaustiveSearchStrategy extends AbstractStrategy{
+public class SinglePlayerExhaustiveSearchStrategy extends AbstractStrategy {
 
 	private IReasoner	reasoner;
 	private String		roleName;
@@ -27,6 +27,7 @@ public class SinglePlayerExhaustiveSearchStrategy extends AbstractStrategy{
 	 */
 	public SinglePlayerExhaustiveSearchStrategy() {
 	
+		
 		this.reasoner	= null;
 		this.roleName	= null;
 		this.endTime	= 0;
@@ -44,7 +45,7 @@ public class SinglePlayerExhaustiveSearchStrategy extends AbstractStrategy{
 	@Override
 	public void initMatch(Match initMatch) {
 		
-		super.initMatch(match);
+		super.initMatch(initMatch);
 		
 		if(match.getGame().getRoleCount()>1){
 			System.err.println(this.getClass().getName() + " only works for single player games!");
@@ -65,12 +66,16 @@ public class SinglePlayerExhaustiveSearchStrategy extends AbstractStrategy{
 			System.out.println(e.getMessage());
 		}
 		
+		/////////////////// START SEARCHING /////////////////////
+		
 		try {
 			// start searching
 			this.searchMethod.search(match.getCurrentNode().getState(), this);
 			
         } catch (PlayTimeOverException e) {
         	System.out.println("initMatch() stopped by time.");
+		} catch (SearchMethodException e) {
+			System.out.println(e.getMessage());
 		}
 	}
 
@@ -81,11 +86,15 @@ public class SinglePlayerExhaustiveSearchStrategy extends AbstractStrategy{
 		this.bestMove = null;
 		
 		try {
+			// set the timeout
+			setTimeout(match.getPlayTime());
 			// start searching
-			this.searchMethod.search(match.getCurrentNode().getState(), this);
+			this.searchMethod.search(currentNode.getState(), this);
 			
         } catch (PlayTimeOverException e) {
         	System.out.println("initMatch() stopped by time.");
+		} catch (SearchMethodException e) {
+			System.out.println(e.getMessage());
 		}
 		
 		return bestMove;
@@ -99,8 +108,8 @@ public class SinglePlayerExhaustiveSearchStrategy extends AbstractStrategy{
 	 */
 	private void setTimeout(int palyTime) {
 		
-		startTime	= System.currentTimeMillis();
-		endTime		= System.currentTimeMillis() + 1000 * palyTime;
+		this.startTime	= System.currentTimeMillis();
+		this.endTime		= System.currentTimeMillis() + 1000 * palyTime;
 	}
 	
 	/**
@@ -110,9 +119,8 @@ public class SinglePlayerExhaustiveSearchStrategy extends AbstractStrategy{
 	
 /*********************** PUBLIC GETTER METHODS *****************************/	
 	public boolean isTimeUp() {
-		return System.currentTimeMillis() >= endTime;
+		return System.currentTimeMillis() >= this.endTime;
 	}
-
 
 	public IReasoner getReasoner() {
 		return reasoner;
@@ -134,6 +142,12 @@ public class SinglePlayerExhaustiveSearchStrategy extends AbstractStrategy{
 	public long getStartTime() {
 		return startTime;
 	}
+	
+
+	public IMove getBestMove() {
+		return bestMove;
+	}
+
 
 	public void setBestMove(IMove bestMove) {
 		this.bestMove = bestMove;

@@ -2,8 +2,8 @@ package is.ru.gapl;
 
 import org.eclipse.palamedes.gdl.core.simulation.StrategyFactory;
 
-import is.ru.gapl.strategy.ExhaustiveSearchStrategy;
 import is.ru.gapl.strategy.MyRandomStrategy;
+import is.ru.gapl.strategy.SinglePlayerExhaustiveSearchStrategy;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -25,8 +25,8 @@ public final class MyPlayer extends Player {
             				"Simulates games and chooses the best path." );
 		
 		StrategyFactory.getInstance().addDescription(
-				"ExhaustiveSearchStrategy",
-				ExhaustiveSearchStrategy.class.getCanonicalName(),
+				"SinglePlayerExhaustiveSearchStrategy",
+				SinglePlayerExhaustiveSearchStrategy.class.getCanonicalName(),
 				"Simulates games ExhaustiveSearchStrategy." );
 	}
 	
@@ -64,13 +64,13 @@ public final class MyPlayer extends Player {
          *       GameFactory.PROLOG is probably the fastest option, but you need
          *       to have Eclipse-Prolog installed (http://www.eclipse-clp.org/). */
         GameFactory factory 	= GameFactory.getInstance();
-        IGame 		runningGame = factory.createGame( GameFactory.JAVAPROVER,
+        IGame 		runningGame = factory.createGame( GameFactory.PROLOGPROVER,
         											  msg.getGameDescription() );
         System.out.println("MyPlayer created the game.");
 
         
         /** XXX: If you implement another strategy here is the place to instantiate it */
-        IStrategy strategy = StrategyFactory.getInstance().createStrategy("ExhaustiveSearchStrategy");
+        IStrategy strategy = StrategyFactory.getInstance().createStrategy("SinglePlayerExhaustiveSearchStrategy");
 
         System.out.println( "MyPlayer created the strategy "      +
                             strategy.getClass().getSimpleName() +
