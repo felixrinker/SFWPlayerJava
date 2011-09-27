@@ -38,7 +38,9 @@ public class SinglePlayerExhaustiveSearchStrategy extends AbstractStrategy {
 		this.searchFactory = SearchFactory.getInstance();
 		
 		// add a new search method to the factory
-		this.searchFactory.addSearchMethod("DeepeningFirstSearch", IterativeDeepeningSearch.class.getCanonicalName());
+		this.searchFactory.addSearchMethod("IterativeDeepeningSearch", IterativeDeepeningSearch.class.getCanonicalName());
+		// add a new search method to the factory
+		//this.searchFactory.addSearchMethod("DeepeningFirstSearch", IterativeDeepeningSearch.class.getCanonicalName());
 	}
 	
 	
@@ -61,7 +63,7 @@ public class SinglePlayerExhaustiveSearchStrategy extends AbstractStrategy {
 		
 		try {
 			// try to create the search method
-			this.searchMethod = this.searchFactory.createSearchMethod("DeepeningFirstSearch");
+			this.searchMethod = this.searchFactory.createSearchMethod("IterativeDeepeningSearch");
 		} catch (SearchMethodException e) {
 			System.out.println(e.getMessage());
 		}
