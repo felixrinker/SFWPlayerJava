@@ -17,14 +17,14 @@ import org.eclipse.palamedes.gdl.core.simulation.strategies.AbstractStrategy;
  * @author SFW GROUP
  *
  */
-public class DeepeningFirstSearch implements ISearch {
+public class DepthFirstSearch implements ISearch {
 
 	private SinglePlayerExhaustiveSearchStrategy strategy;
 	private String roleName;
 	private IReasoner reasoner;
 	private HashMap<IGameState,StateValue> statesCache;
 	
-	public DeepeningFirstSearch() {
+	public DepthFirstSearch() {
 		
 		this.statesCache = new HashMap<IGameState, StateValue>();
 	}
