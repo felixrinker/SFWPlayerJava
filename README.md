@@ -1,6 +1,6 @@
-SFWPlayerJava
+#SFWPlayerJava
 
-Based on: http://sourceforge.net/projects/palamedes-ide/
+ased on: http://sourceforge.net/projects/palamedes-ide/
 
 Requirements:
 - maven2
