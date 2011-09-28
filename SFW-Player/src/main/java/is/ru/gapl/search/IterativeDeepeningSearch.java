@@ -12,6 +12,7 @@ import org.eclipse.palamedes.gdl.core.model.IGameState;
 import org.eclipse.palamedes.gdl.core.model.IMove;
 import org.eclipse.palamedes.gdl.core.model.IReasoner;
 import org.eclipse.palamedes.gdl.core.simulation.strategies.AbstractStrategy;
+import org.apache.commons.collections.map.ReferenceMap;
 
 /**
  * 
@@ -215,7 +216,7 @@ public class IterativeDeepeningSearch implements ISearch {
 			}
 			// stop searching if we found the best solution
 			if (newScore == 100) {
-				System.out.println("RETURN 100");
+				//System.out.println("RETURN 100");
 				break;
 			}
 		}
@@ -223,6 +224,7 @@ public class IterativeDeepeningSearch implements ISearch {
 		// checks if state exists in cache
 		if(statesCache.containsKey(nextState)) {
 			StateValue cacheValue = statesCache.get(nextState);
+			System.out.println("CACHE HIT");
 			
 			// replace entry if score is -1 set all legal moves
 			if(cacheValue.getScore() == -1) {
