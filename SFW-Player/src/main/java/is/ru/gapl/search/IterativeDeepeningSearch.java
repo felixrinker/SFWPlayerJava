@@ -12,6 +12,7 @@ import org.eclipse.palamedes.gdl.core.model.IGameState;
 import org.eclipse.palamedes.gdl.core.model.IMove;
 import org.eclipse.palamedes.gdl.core.model.IReasoner;
 import org.eclipse.palamedes.gdl.core.simulation.strategies.AbstractStrategy;
+import static org.apache.commons.collections.map.AbstractReferenceMap.SOFT;
 import org.apache.commons.collections.map.ReferenceMap;
 
 /**
@@ -24,11 +25,12 @@ public class IterativeDeepeningSearch implements ISearch {
 	private SinglePlayerExhaustiveSearchStrategy strategy;
 	private String roleName;
 	private IReasoner reasoner;
-	private HashMap<IGameState,StateValue> statesCache;
+	private ReferenceMap statesCache;
+	
 	
 	public IterativeDeepeningSearch() {
 		
-		this.statesCache = new HashMap<IGameState, StateValue>();
+		this.statesCache = new ReferenceMap(SOFT, SOFT);
 	}
 	
 	@Override
@@ -40,7 +42,7 @@ public class IterativeDeepeningSearch implements ISearch {
 		HashMap<IMove, IGameState> nextMoves = null;
 		IMove[] moves = null;
 		if(statesCache.containsKey(gameState)) {
-			StateValue cacheState = statesCache.get(gameState);
+			StateValue cacheState = ((StateValue) statesCache.get(gameState));
 			int maxScore = cacheState.getScore();
 			
 			// if the state contains the max score
@@ -59,7 +61,7 @@ public class IterativeDeepeningSearch implements ISearch {
 		
 		
 		if(statesCache.containsKey(gameState)) {
-			this.strategy.setBestMove((statesCache.get(gameState)).getBestMove());
+			this.strategy.setBestMove(((StateValue)statesCache.get(gameState)).getBestMove());
 			throw new SearchMethodException("Found state in the cache");
 		}
 			
@@ -114,7 +116,7 @@ public class IterativeDeepeningSearch implements ISearch {
 				
 				// checks if state exists in cache
 				if(statesCache.containsKey(gameState)) {
-					StateValue cacheValue = statesCache.get(gameState);
+					StateValue cacheValue = (StateValue) statesCache.get(gameState);
 					
 					// replace entry if score is -1 set all legal moves
 					if(cacheValue.getScore() == -1) {
@@ -153,7 +155,7 @@ public class IterativeDeepeningSearch implements ISearch {
 		HashMap<IMove, IGameState> nextMoves=null;
 		
 		if(statesCache.containsKey(nextState)) {
-			StateValue cacheState = statesCache.get(nextState);
+			StateValue cacheState = (StateValue) statesCache.get(nextState);
 			maxScore = cacheState.getScore();
 			
 			// if the state contains the max score
@@ -223,7 +225,7 @@ public class IterativeDeepeningSearch implements ISearch {
 		
 		// checks if state exists in cache
 		if(statesCache.containsKey(nextState)) {
-			StateValue cacheValue = statesCache.get(nextState);
+			StateValue cacheValue = (StateValue)statesCache.get(nextState);
 			System.out.println("CACHE HIT");
 			
 			// replace entry if score is -1 set all legal moves
