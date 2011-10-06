@@ -3,7 +3,7 @@ package is.ru.gapl;
 import org.eclipse.palamedes.gdl.core.simulation.StrategyFactory;
 
 import is.ru.gapl.strategy.MyRandomStrategy;
-import is.ru.gapl.strategy.SinglePlayerExhaustiveSearchStrategy;
+import is.ru.gapl.strategy.MyExhaustiveSearchStrategy;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -26,7 +26,7 @@ public final class MyPlayer extends Player {
 		
 		StrategyFactory.getInstance().addDescription(
 				"SinglePlayerExhaustiveSearchStrategy",
-				SinglePlayerExhaustiveSearchStrategy.class.getCanonicalName(),
+				MyExhaustiveSearchStrategy.class.getCanonicalName(),
 				"Simulates games ExhaustiveSearchStrategy." );
 	}
 	

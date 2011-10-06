@@ -5,7 +5,7 @@ import java.util.HashMap;
 import is.ru.gapl.exception.PlayTimeOverException;
 import is.ru.gapl.exception.SearchMethodException;
 import is.ru.gapl.model.StateValue;
-import is.ru.gapl.strategy.SinglePlayerExhaustiveSearchStrategy;
+import is.ru.gapl.strategy.MyExhaustiveSearchStrategy;
 
 import org.eclipse.palamedes.gdl.core.model.IGameState;
 import org.eclipse.palamedes.gdl.core.model.IMove;
@@ -19,7 +19,7 @@ import org.eclipse.palamedes.gdl.core.simulation.strategies.AbstractStrategy;
  */
 public class DepthFirstSearch implements ISearch {
 
-	private SinglePlayerExhaustiveSearchStrategy strategy;
+	private MyExhaustiveSearchStrategy strategy;
 	private String roleName;
 	private IReasoner reasoner;
 	private HashMap<IGameState,StateValue> statesCache;
@@ -43,7 +43,7 @@ public class DepthFirstSearch implements ISearch {
 		/**
 		 *@TODO FIX ME - unsafe cast. Solution introduce abstract strategy class or interface 
 		 */	
-		this.strategy	= (SinglePlayerExhaustiveSearchStrategy) strategy;
+		this.strategy	= (MyExhaustiveSearchStrategy) strategy;
 		this.roleName	= this.strategy.getRoleName();
 		this.reasoner	= this.strategy.getReasoner();
 		
