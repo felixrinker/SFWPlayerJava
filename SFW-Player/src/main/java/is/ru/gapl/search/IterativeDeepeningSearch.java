@@ -1,7 +1,6 @@
 package is.ru.gapl.search;
 
 import java.util.HashMap;
-import java.util.Set;
 
 import is.ru.gapl.exception.PlayTimeOverException;
 import is.ru.gapl.exception.SearchMethodException;
@@ -27,6 +26,7 @@ public class IterativeDeepeningSearch implements ISearch {
 	private String roleName;
 	private IReasoner reasoner;
 	private ReferenceMap statesCache;
+	private IMove bestMove;
 	
 	
 	public IterativeDeepeningSearch() {
@@ -42,30 +42,14 @@ public class IterativeDeepeningSearch implements ISearch {
 		
 		HashMap<IMove, IGameState> nextMoves = null;
 		IMove[] moves = null;
+		
 		if(statesCache.containsKey(gameState)) {
 			StateValue cacheState = ((StateValue) statesCache.get(gameState));
-			int maxScore = cacheState.getScore();
 			
-			// if the state contains the max score
-			if(maxScore == 100) {
 				this.strategy.setBestMove(cacheState.getBestMove());
 				throw new SearchMethodException("Found state in the cache");
-			}
-			
-			nextMoves = cacheState.getNextMoves();
-			if(nextMoves != null) {
-				Set<IMove> mov = nextMoves.keySet();
-				moves =  mov.toArray(new IMove[0]);
-			}
 		}
 		
-		
-		
-		if(statesCache.containsKey(gameState)) {
-			this.strategy.setBestMove(((StateValue)statesCache.get(gameState)).getBestMove());
-			throw new SearchMethodException("Found state in the cache");
-		}
-			
 		/**
 		 *@TODO FIX ME - unsafe cast. Solution introduce abstract strategy class or interface 
 		 */	
@@ -75,7 +59,7 @@ public class IterativeDeepeningSearch implements ISearch {
 		
 		try {
 			// calculate the moves if they not set
-			if(moves == null) moves = this.reasoner.getLegalMoves(roleName, gameState);
+			moves = this.reasoner.getLegalMoves(roleName, gameState);
 			System.out.println("LEGAL MOVES:");
 			for (IMove move : moves) {
 			System.out.println(" - "+move.toString());
@@ -88,8 +72,10 @@ public class IterativeDeepeningSearch implements ISearch {
 			int newScore = -1;
 			int depth	= 1;
 		//	while(true) {
-				HashMap<IMove, IGameState> newNextMoves= new HashMap<IMove, IGameState>();
+				
 				for (IMove move : moves) {
+					
+					checkTime();
 					
 					singleMove[0] = move;
 					IGameState newState = null;
@@ -104,9 +90,10 @@ public class IterativeDeepeningSearch implements ISearch {
 					// try to find the max score
 					newScore = maxScore(newState, depth, 0);
 					
-					newNextMoves.put(move, newState);
+					
 					
 					if (newScore > maxScore) {
+						this.bestMove = move;
 						this.strategy.setBestMove(move);
 						maxScore = newScore;
 						System.out.println(" - MOVE: "+move+" :: NEW-SCORE: "+newScore);
@@ -115,24 +102,7 @@ public class IterativeDeepeningSearch implements ISearch {
 					if (newScore == 100) break;//throw new SearchMethodException("We found the best solution");
 				}
 				
-				// checks if state exists in cache
-				if(statesCache.containsKey(gameState)) {
-					StateValue cacheValue = (StateValue) statesCache.get(gameState);
-					
-					// replace entry if score is -1 set all legal moves
-					if(cacheValue.getScore() == -1) {
-						this.statesCache.put(gameState, new StateValue(maxScore, depth, this.strategy.getBestMove(), newNextMoves));
-					}
-					// replace cache entry if new depth is higher
-					if(cacheValue.getScore() < maxScore) {
-						this.statesCache.put(gameState, new StateValue(maxScore, depth, this.strategy.getBestMove(), newNextMoves));
-						System.out.println("UPDATE CACHE STATE: "+gameState+" DEPTH: "+depth+" SCORE: "+newScore+" MOVE: "+this.strategy.getBestMove());
-					}
-				}else {
-					// add new cache entry if nothing exists
-					this.statesCache.put(gameState, new StateValue(maxScore, depth, this.strategy.getBestMove(), newNextMoves));
-					System.out.println("NEW ROOT STATE: "+gameState+" DEPTH: "+depth+" SCORE: "+newScore+" MOVE: "+this.strategy.getBestMove());
-				}
+				statesCache.put(gameState, new StateValue(maxScore, bestMove));
 				// increase depth
 				depth++;
 			//}	
@@ -159,16 +129,7 @@ public class IterativeDeepeningSearch implements ISearch {
 			StateValue cacheState = (StateValue) statesCache.get(nextState);
 			maxScore = cacheState.getScore();
 			
-			// if the state contains the max score
-			if(maxScore == 100) return maxScore;
-			// return the cache value if terminal
-			if(nextState.isTerminal()) return maxScore;
-			
-			nextMoves = cacheState.getNextMoves();
-			if(nextMoves != null) {
-				Set<IMove> mov = nextMoves.keySet();
-				moves =  mov.toArray(new IMove[0]);
-			}
+			return maxScore;
 		}
 		
 		// if the state is a terminal state return the calculated value
@@ -190,9 +151,8 @@ public class IterativeDeepeningSearch implements ISearch {
 		int c = count;
 		c++;
 		// calculate the moves if they not set
-		if(moves == null) moves = this.reasoner.getLegalMoves(roleName, nextState);
+		moves = this.reasoner.getLegalMoves(roleName, nextState);
 		
-		HashMap<IMove, IGameState> newNextMoves= new HashMap<IMove, IGameState>();
 		IMove[] singleMove = new IMove[1];
 		for (IMove move : moves) {
 			
@@ -211,8 +171,6 @@ public class IterativeDeepeningSearch implements ISearch {
 			// try to find the max score
 			newScore = maxScore(newState, depth, c);
 			
-			newNextMoves.put(move, newState);
-			
 			if (newScore > maxScore) {
 				maxScore = newScore;
 				bestMove = move;
@@ -224,25 +182,7 @@ public class IterativeDeepeningSearch implements ISearch {
 			}
 		}
 		
-		// checks if state exists in cache
-		if(statesCache.containsKey(nextState)) {
-			StateValue cacheValue = (StateValue)statesCache.get(nextState);
-			System.out.println("CACHE HIT");
-			
-			// replace entry if score is -1 set all legal moves
-			if(cacheValue.getScore() == -1) {
-				this.statesCache.put(nextState, new StateValue(maxScore, depth, bestMove, newNextMoves));
-			}
-			// replace cache entry if new depth is higher
-			if(cacheValue.getScore() < maxScore) {
-				this.statesCache.put(nextState, new StateValue(maxScore, depth, bestMove, newNextMoves));
-				System.out.println("UPDATE  STATE: "+nextState+" DEPTH: "+count+" SCORE: "+maxScore);
-			}
-		}else {
-			// add new cache entry if nothing exists
-			this.statesCache.put(nextState, new StateValue(maxScore, depth, bestMove, newNextMoves));
-			System.out.println("NEW STATE: "+nextState+" DEPTH: "+count+" SCORE: "+maxScore);
-		}
+		statesCache.put(nextState, new StateValue(maxScore, bestMove));
 		
 		return maxScore;
 	}
