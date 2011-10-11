@@ -11,6 +11,9 @@ import org.eclipse.palamedes.gdl.core.model.IGameState;
 import org.eclipse.palamedes.gdl.core.model.IMove;
 import org.eclipse.palamedes.gdl.core.model.IReasoner;
 import org.eclipse.palamedes.gdl.core.simulation.strategies.AbstractStrategy;
+import static org.apache.commons.collections.map.AbstractReferenceMap.SOFT;
+import org.apache.commons.collections.map.ReferenceMap;
+
 
 /**
  * 
@@ -22,11 +25,13 @@ public class DepthFirstSearch implements ISearch {
 	private MyExhaustiveSearchStrategy strategy;
 	private String roleName;
 	private IReasoner reasoner;
-	private HashMap<IGameState,StateValue> statesCache;
+	private ReferenceMap statesCache;
+	private IMove bestMove;
+	
 	
 	public DepthFirstSearch() {
 		
-		this.statesCache = new HashMap<IGameState, StateValue>();
+		this.statesCache = new ReferenceMap(SOFT, SOFT);
 	}
 	
 	@Override
@@ -35,11 +40,16 @@ public class DepthFirstSearch implements ISearch {
 		// do nothing if we are in a terminal state
 		if(gameState.isTerminal()) throw new SearchMethodException("Current state is a terminal state");
 		
+		HashMap<IMove, IGameState> nextMoves = null;
+		IMove[] moves = null;
+		
 		if(statesCache.containsKey(gameState)) {
-			this.strategy.setBestMove((statesCache.get(gameState)).getBestMove());
-			throw new SearchMethodException("Found state in the cache");
-		}
+			StateValue cacheState = ((StateValue) statesCache.get(gameState));
 			
+				this.strategy.setBestMove(cacheState.getBestMove());
+				throw new SearchMethodException("Found state in the cache");
+		}
+		
 		/**
 		 *@TODO FIX ME - unsafe cast. Solution introduce abstract strategy class or interface 
 		 */	
@@ -48,7 +58,8 @@ public class DepthFirstSearch implements ISearch {
 		this.reasoner	= this.strategy.getReasoner();
 		
 		try {
-			IMove[] moves = this.reasoner.getLegalMoves(roleName, gameState);
+			// calculate the moves if they not set
+			moves = this.reasoner.getLegalMoves(roleName, gameState);
 			System.out.println("LEGAL MOVES:");
 			for (IMove move : moves) {
 			System.out.println(" - "+move.toString());
@@ -59,23 +70,42 @@ public class DepthFirstSearch implements ISearch {
 			IMove[] singleMove = new IMove[1];
 			int maxScore = -1;
 			int newScore = -1;
-			
-			for (IMove move : moves) {
+			int depth	= 1;
+		//	while(true) {
 				
-				singleMove[0] = move;
-				IGameState newState	= reasoner.getNextState(gameState, singleMove);
-				System.out.println("NEW-STATE: "+newState+" :: MOVE: "+move);
-				// try to find the max score
-				newScore = maxScore(newState, 0, 0);
-				if (newScore > maxScore) {
-					this.strategy.setBestMove(move);
-					maxScore = newScore;
-					System.out.println(" - MOVE: "+move+" :: NEW-SCORE: "+newScore);
+				for (IMove move : moves) {
+					
+					checkTime();
+					
+					singleMove[0] = move;
+					IGameState newState = null;
+					// check if cache values can be used
+					if(nextMoves == null) {
+						newState = reasoner.getNextState(gameState, singleMove);
+					}else {
+						// use cache value
+						newState = nextMoves.get(move);
+					}	
+					//System.out.println("NEW-STATE: "+newState+" :: MOVE: "+move);
+					// try to find the max score
+					newScore = maxScore(newState, depth, 0);
+					
+					
+					
+					if (newScore > maxScore) {
+						this.bestMove = move;
+						this.strategy.setBestMove(move);
+						maxScore = newScore;
+						System.out.println(" - MOVE: "+move+" :: NEW-SCORE: "+newScore);
+					}
+					// stop searching if we found the best solution
+					if (newScore == 100) break;//throw new SearchMethodException("We found the best solution");
 				}
-				// stop searching if we found the best solution
-				if (newScore == 100) throw new SearchMethodException("We found the best solution");
-			}
-			statesCache.put(gameState, new StateValue(maxScore,this.strategy.getBestMove()));
+				
+				statesCache.put(gameState, new StateValue(maxScore, bestMove));
+				// increase depth
+				depth++;
+			//}	
 			
 		} catch (InterruptedException e) {
 			System.out.println(e.getMessage());
@@ -89,44 +119,70 @@ public class DepthFirstSearch implements ISearch {
 	 * @throws InterruptedException 
 	 * @throws PlayTimeOverException 
 	 */
-	private int maxScore( IGameState nextState, int count, long endTime ) throws InterruptedException, PlayTimeOverException { 
+	private int maxScore( IGameState nextState, int depth, int count) throws InterruptedException, PlayTimeOverException { 
 
 		int maxScore = -1;
+		IMove[] moves = null;
+		HashMap<IMove, IGameState> nextMoves=null;
+		
 		if(statesCache.containsKey(nextState)) {
-			maxScore = (statesCache.get(nextState)).getScore();
+			StateValue cacheState = (StateValue) statesCache.get(nextState);
+			maxScore = cacheState.getScore();
+			
 			return maxScore;
 		}
 		
+		// if the state is a terminal state return the calculated value
 		if(nextState.isTerminal()) {
 			maxScore = reasoner.getGoalValue(roleName, nextState);
 			this.statesCache.put(nextState, new StateValue(maxScore));
+			//System.out.println("PUT TERMINAL STATE: "+nextState+" DEPTH: "+count+" SCORE: "+maxScore);
+			
 			return maxScore;
 		}
+		
+		// if the current depth count is equals to the specified depth return the maxscore
+		/*if(count >= depth) {
+			return maxScore;
+		}*/
 		
 		IMove bestMove	= null;
 		int newScore	= -1;
 		int c = count;
 		c++;
+		// calculate the moves if they not set
+		moves = this.reasoner.getLegalMoves(roleName, nextState);
 		
-		IMove[] moves = this.reasoner.getLegalMoves(roleName, nextState);
 		IMove[] singleMove = new IMove[1];
 		for (IMove move : moves) {
 			
 			checkTime();
 			
 			singleMove[0] = move;
-			IGameState newState	= reasoner.getNextState(nextState, singleMove);
+			IGameState newState = null;
+			// check if cache values can be used
+			if(nextMoves == null) {
+				newState = reasoner.getNextState(nextState, singleMove);
+			}else {
+				// use cache value
+				newState = nextMoves.get(move);
+			}	
 			
 			// try to find the max score
-			newScore = maxScore(newState, c, 0);
+			newScore = maxScore(newState, depth, c);
+			
 			if (newScore > maxScore) {
 				maxScore = newScore;
 				bestMove = move;
 			}
 			// stop searching if we found the best solution
-			if (newScore == 100) return maxScore;
+			if (newScore == 100) {
+				//System.out.println("RETURN 100");
+				break;
+			}
 		}
-		this.statesCache.put(nextState, new StateValue(maxScore, bestMove));
+		
+		statesCache.put(nextState, new StateValue(maxScore, bestMove));
 		
 		return maxScore;
 	}
