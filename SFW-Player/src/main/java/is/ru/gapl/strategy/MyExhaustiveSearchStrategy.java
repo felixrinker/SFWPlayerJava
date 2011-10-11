@@ -2,6 +2,7 @@ package is.ru.gapl.strategy;
 
 import is.ru.gapl.exception.PlayTimeOverException;
 import is.ru.gapl.exception.SearchMethodException;
+import is.ru.gapl.search.IterativeDeepeningCacheSearch;
 import is.ru.gapl.search.IterativeDeepeningSearch;
 import is.ru.gapl.search.DepthFirstSearch;
 import is.ru.gapl.search.IterativeDeepening2PlayerSearch;
@@ -43,6 +44,7 @@ public class MyExhaustiveSearchStrategy extends AbstractStrategy {
 		this.searchFactory.addSearchMethod("IterativeDeepeningSearch", IterativeDeepeningSearch.class.getCanonicalName());
 		this.searchFactory.addSearchMethod("DepthFirstSearch", DepthFirstSearch.class.getCanonicalName());
 		this.searchFactory.addSearchMethod("IterativeDeepening2PlayerSearch", IterativeDeepening2PlayerSearch.class.getCanonicalName());
+		this.searchFactory.addSearchMethod("IterativeDeepeningCacheSearch", IterativeDeepeningCacheSearch.class.getCanonicalName());
 	}
 	
 	
