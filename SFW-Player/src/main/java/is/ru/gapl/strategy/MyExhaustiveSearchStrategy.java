@@ -3,6 +3,8 @@ package is.ru.gapl.strategy;
 import is.ru.gapl.exception.PlayTimeOverException;
 import is.ru.gapl.exception.SearchMethodException;
 import is.ru.gapl.search.IterativeDeepeningSearch;
+import is.ru.gapl.search.DepthFirstSearch;
+import is.ru.gapl.search.IterativeDeepening2PlayerSearch;
 import is.ru.gapl.search.ISearch;
 import is.ru.gapl.search.SearchFactory;
 
@@ -12,7 +14,7 @@ import org.eclipse.palamedes.gdl.core.model.IReasoner;
 import org.eclipse.palamedes.gdl.core.simulation.Match;
 import org.eclipse.palamedes.gdl.core.simulation.strategies.AbstractStrategy;
 
-public class SinglePlayerExhaustiveSearchStrategy extends AbstractStrategy {
+public class MyExhaustiveSearchStrategy extends AbstractStrategy {
 
 	private IReasoner	reasoner;
 	private String		roleName;
@@ -25,7 +27,7 @@ public class SinglePlayerExhaustiveSearchStrategy extends AbstractStrategy {
 	/**
 	 * Constructs the SinglePlayerExhaustiveSearchStrategy class
 	 */
-	public SinglePlayerExhaustiveSearchStrategy() {
+	public MyExhaustiveSearchStrategy() {
 	
 		
 		this.reasoner	= null;
@@ -37,10 +39,10 @@ public class SinglePlayerExhaustiveSearchStrategy extends AbstractStrategy {
 		// get instance of the search factory
 		this.searchFactory = SearchFactory.getInstance();
 		
-		// add a new search method to the factory
+		// add search methods to the factory
 		this.searchFactory.addSearchMethod("IterativeDeepeningSearch", IterativeDeepeningSearch.class.getCanonicalName());
-		// add a new search method to the factory
-		//this.searchFactory.addSearchMethod("DeepeningFirstSearch", IterativeDeepeningSearch.class.getCanonicalName());
+		this.searchFactory.addSearchMethod("DepthFirstSearch", DepthFirstSearch.class.getCanonicalName());
+		this.searchFactory.addSearchMethod("IterativeDeepening2PlayerSearch", IterativeDeepening2PlayerSearch.class.getCanonicalName());
 	}
 	
 	
@@ -48,13 +50,8 @@ public class SinglePlayerExhaustiveSearchStrategy extends AbstractStrategy {
 	public void initMatch(Match initMatch) {
 		
 		super.initMatch(initMatch);
-		
-		if(match.getGame().getRoleCount()>1){
-			System.err.println(this.getClass().getName() + " only works for single player games!");
-			return;
-		}
 		this.reasoner = match.getGame().getReasoner();
-		this.roleName = match.getGame().getRoleNames()[0];
+		this.roleName = match.getRole();
 		
 		this.bestMove = null;
 		
@@ -62,8 +59,14 @@ public class SinglePlayerExhaustiveSearchStrategy extends AbstractStrategy {
 		this.setTimeout(match.getStartTime());
 		
 		try {
+		
+		if(match.getGame().getRoleCount() == 1){
 			// try to create the search method
 			this.searchMethod = this.searchFactory.createSearchMethod("IterativeDeepeningSearch");
+		} else if (match.getGame().getRoleCount() == 2){
+			this.searchMethod = this.searchFactory.createSearchMethod("IterativeDeepening2PlayerSearch");
+        }
+
 		} catch (SearchMethodException e) {
 			System.out.println(e.getMessage());
 		}
