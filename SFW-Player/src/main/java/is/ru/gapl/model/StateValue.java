@@ -15,6 +15,8 @@ public class StateValue {
 	private IMove bestMove;
 	private int depth;
 	private HashMap<IMove, IGameState> nextMoves;
+	private boolean expanded;
+	
 	
 	/**
 	 * Constructor for terminal state
@@ -68,7 +70,7 @@ public class StateValue {
 		this.score = score;
 		this.depth = depth;
 		this.bestMove = bestMove;
-		this.nextMoves = new HashMap<IMove, IGameState>();
+		this.nextMoves = nextMoves;
 	}
 
 	/*************************** GETTER / SETTER *******************************/
@@ -103,5 +105,20 @@ public class StateValue {
 
 	public void setNextMoves(HashMap<IMove, IGameState> nextMoves) {
 		this.nextMoves = nextMoves;
+	}
+
+	public boolean isExpanded() {
+		return expanded;
+	}
+
+	public void setExpanded(boolean expanded) {
+		this.expanded = expanded;
+	}
+
+	@Override
+	public String toString() {
+		return "StateValue [score=" + score + ", bestMove=" + bestMove
+				+ ", depth=" + depth + ", nextMoves=" + nextMoves
+				+ ", expanded=" + expanded + "]";
 	}
 }
