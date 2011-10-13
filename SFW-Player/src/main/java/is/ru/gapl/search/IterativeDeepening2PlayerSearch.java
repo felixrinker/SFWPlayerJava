@@ -8,6 +8,7 @@ import is.ru.gapl.exception.SearchMethodException;
 import is.ru.gapl.model.StateValue;
 import is.ru.gapl.strategy.MyExhaustiveSearchStrategy;
 
+import org.eclipse.palamedes.gdl.core.model.IGameNode;
 import org.eclipse.palamedes.gdl.core.model.IGameState;
 import org.eclipse.palamedes.gdl.core.model.IMove;
 import org.eclipse.palamedes.gdl.core.model.IReasoner;
@@ -24,6 +25,7 @@ public class IterativeDeepening2PlayerSearch implements ISearch {
 	private String roleName;
 	private IReasoner reasoner;
 	private HashMap<IGameState,StateValue> statesCache;
+	private IGameState gameState;
 	
 	public IterativeDeepening2PlayerSearch() {
 		
@@ -31,7 +33,9 @@ public class IterativeDeepening2PlayerSearch implements ISearch {
 	}
 	
 	@Override
-	public void search(IGameState gameState, AbstractStrategy strategy) throws SearchMethodException, PlayTimeOverException {
+	public void search(IGameNode gameNode, AbstractStrategy strategy) throws SearchMethodException, PlayTimeOverException {
+		
+		this.gameState = gameNode.getState();
 		
 		// do nothing if we are in a terminal state
 		if(gameState.isTerminal()) throw new SearchMethodException("Current state is a terminal state");
@@ -66,7 +70,7 @@ public class IterativeDeepening2PlayerSearch implements ISearch {
 		 *@TODO FIX ME - unsafe cast. Solution introduce abstract strategy class or interface 
 		 */	
 		this.strategy	= (MyExhaustiveSearchStrategy) strategy;
-		this.roleName	= this.strategy.getRoleName();
+		this.roleName	= this.strategy.getOwnRoleName();
 		this.reasoner	= this.strategy.getReasoner();
 		
 		try {
