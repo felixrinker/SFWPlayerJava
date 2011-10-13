@@ -23,10 +23,12 @@ public class MinMax implements ISearch {
 	private int ownRoleNum;
 	
 	
-	private IMove[][] bestPathBeni; 
-	private IMove[][] bestPathTempBeni; 
+	private IMove[][] bestPath; 
+	private IMove[][] bestPathTemp; 
 	private IMove returnMove;
 	private Random randomGen;
+	
+	private boolean debug = true;
 	
 	
 
@@ -42,10 +44,9 @@ public class MinMax implements ISearch {
 		this.ownRoleNum		= this.strategy.getOwnRoleNum();
 		
 		// init best path array
-		this.bestPathBeni		= new IMove[this.strategy.getMaxSteps()][match.getGame().getRoleCount()];//maxSteps = maximale Tiefe und anzahl Spieler
-        this.bestPathTempBeni	= new IMove[this.strategy.getMaxSteps()][match.getGame().getRoleCount()];//maxSteps = maximale Tiefe und anzahl Spieler
-        
-        this.randomGen = new Random();
+		this.bestPath		= new IMove[this.strategy.getMaxSteps()][match.getGame().getRoleCount()];
+        this.bestPathTemp	= new IMove[this.strategy.getMaxSteps()][match.getGame().getRoleCount()];
+        this.randomGen 		= new Random();
 	}
 	
 	
@@ -59,23 +60,20 @@ public class MinMax implements ISearch {
 			System.out.println( "Start Alpha-Beta Pruning");
 			bestValue = alphaBetaPruning(currentNode ,-100 ,100);
 
-    		System.out.println("Current depth: "+currentNode.getDepth() +" //BestPathBeni: ");
+			debug( "bestGoalValue[" + (int)bestValue + "], move[" + bestPath[currentNode.getDepth()][this.ownRoleNum] + "]");
+			
+			debug("Current depth: "+currentNode.getDepth() +" //BestPathBeni: ");
     		
     		//DEBUG
-    		for(IMove[] move: bestPathBeni) {
+    		for(IMove[] move: bestPath) {
     			
     			System.out.print(move[this.ownRoleNum] + " | ");
     	
     		}
 			
-    		returnMove = bestPathBeni[currentNode.getDepth()][this.ownRoleNum];
+    		returnMove = bestPath[currentNode.getDepth()][this.ownRoleNum];
     		
     		System.out.println("return move : "+returnMove);
-    		
-    		// delete noops
-    		for(int i = 0; returnMove.toString().indexOf("noop") !=-1 ; i++) {
-    			returnMove = bestPathBeni[currentNode.getDepth()+i][this.ownRoleNum];
-	    	}
     		
             if(returnMove == null) {
             	// play random move
@@ -113,8 +111,13 @@ public class MinMax implements ISearch {
 		// get currentPlayer
 		int roleNum = getCurrentRole(gameNode);
 		
+		//debug("current role: "+roleNum);
+		
 		// if terminal return evaluate state
-		if( gameNode.getState().isTerminal() ) return evaluateState( gameNode.getState(), this.ownRoleNum );
+		if( gameNode.getState().isTerminal() ) {
+			debug("Found terminal state");
+			return evaluateState( gameNode.getState(), this.ownRoleNum );
+		}
 		
 		
 		// initial nodes
@@ -123,19 +126,21 @@ public class MinMax implements ISearch {
         
         // if its our turn, then MAX
 	    if( roleNum == this.ownRoleNum ) {
-	    	
+	    	//debug("Its our turn");
 	    	while ( fringe.hasUnexpandedMove() ) {
 	    		
-	        	IMove[] moves = fringe.getRandomUnexpandedMove();
+	        	IMove[] nextMove = fringe.getRandomUnexpandedMove();
 	        	
-	        	bestPathTempBeni[gameNode.getDepth()] = moves;
-	        	IGameNode  newChildNode  = game.getNextNode(gameNode, moves);
+	        	bestPathTemp[gameNode.getDepth()] = nextMove;
+	        	IGameNode  newChildNode  = game.getNextNode(gameNode, nextMove);
 	        	
 	        	double score = alphaBetaPruning(newChildNode, alpha, beta);
 	        	
 	        	if( score > alpha) {
+	        		//debug("new alpha value: "+ score);
 		        	alpha = score;
-		        	bestPathBeni = bestPathTempBeni.clone();
+		        	this.strategy.setBestMove(nextMove[this.ownRoleNum]);
+		        	bestPath = bestPathTemp.clone();
 		        }
 	        	if (alpha >= beta){     
 	        		return beta;
@@ -146,21 +151,21 @@ public class MinMax implements ISearch {
 	    	return alpha;
 	    	
 	    }else{ 
-	    	
+	    	//debug("Its oponents turn");
 	    	while ( fringe.hasUnexpandedMove() ) {
 	    		
-	        	IMove[] moves = fringe.getRandomUnexpandedMove();
+	        	IMove[] nextMove = fringe.getRandomUnexpandedMove();
 	        	
-	        	bestPathTempBeni[gameNode.getDepth()] = moves;
+	        	bestPathTemp[gameNode.getDepth()] = nextMove;
 	        	
-	        	IGameNode  newChildNode  = game.getNextNode(gameNode, moves);
+	        	IGameNode  newChildNode  = game.getNextNode(gameNode, nextMove);
 	        	
-	        	double score = alphaBetaPruning(newChildNode,alpha,beta);
+	        	double score = alphaBetaPruning(newChildNode, alpha, beta);
 	        	
 	        	if( score < beta){
 	        		beta = score;
-	        	}
-		        if (alpha >= beta){  
+	        		
+	        	}if (alpha >= beta){  
 		        	
 		        	return alpha;
 		        }
@@ -181,7 +186,7 @@ public class MinMax implements ISearch {
 		int roleCount = game.getRoleCount();
 		for( int roleNum = 0; roleNum < roleCount; roleNum++) {
 			
-			if( checkTurn(roleNum,gameNode) ) return roleNum;
+			if( checkTurn( gameNode, roleNum ) ) return roleNum;
 		}
 		return 0;
 	}
@@ -192,10 +197,11 @@ public class MinMax implements ISearch {
 	 * @param gameNode
 	 * @return
 	 */
-	private boolean checkTurn (int roleNum, IGameNode gameNode) {
+	private boolean checkTurn (IGameNode gameNode, int roleNum) {
 		try {
 			
 			IMove[] moves = game.getLegalMoves(gameNode)[roleNum];	
+			
 			for( IMove move: moves ) {
 				
 				// if moves contain a noop its not our turn
@@ -222,21 +228,30 @@ public class MinMax implements ISearch {
 			
 			double sumOponent	= 0;
 			double ourGoalValue	= 0;
-			int[] goalsAllRoles = gameState.getGoalValues();
+			int[] goalValues	= gameState.getGoalValues();
 			
-			for(int i=0;i<goalsAllRoles.length;i++) {
-				
-				if( roleNum != i ) {
-					sumOponent += goalsAllRoles[i];
-				}else{
-					ourGoalValue = goalsAllRoles[i]; 
+			for( int rCt=0; rCt < goalValues.length; rCt++ ) {
+				if( roleNum == rCt ) {
+					// set out goal value
+					ourGoalValue = goalValues[rCt]; 	
+				}else {
+					// set opponent goal value
+					sumOponent += goalValues[rCt];
 				}
 			}
-			return ourGoalValue-sumOponent;
+			return ourGoalValue - sumOponent;
 			
 		}else{
 			
 			return (-100/game.getRoleCount());
+		}
+	}
+	
+	private void debug(String txt) {
+		
+		if(debug) {
+			
+			System.out.println("DEBUG: "+txt);
 		}
 	}
 }

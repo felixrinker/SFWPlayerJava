@@ -75,7 +75,7 @@ public class MyExhaustiveSearchStrategy extends AbstractStrategy {
 		try {
 			if(match.getGame().getRoleCount() == 1) {
 				// try to create the search method
-				this.searchMethod = this.searchFactory.createSearchMethod("IterativeDeepeningSearch");
+				this.searchMethod = this.searchFactory.createSearchMethod("DepthFirstSearch");
 				System.out.println("We have choosen singleplayer mode");
 				
 			} else if (match.getGame().getRoleCount() >= 2){
