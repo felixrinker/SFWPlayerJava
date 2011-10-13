@@ -23,4 +23,9 @@ public interface ISearch {
 	 * @throws SearchMethodException 
 	 */
 	public void search(IGameNode currentNode, AbstractStrategy strategy) throws SearchMethodException, PlayTimeOverException;
+
+	/**
+	 * 
+	 */
+	public void init(AbstractStrategy strategy);
 }

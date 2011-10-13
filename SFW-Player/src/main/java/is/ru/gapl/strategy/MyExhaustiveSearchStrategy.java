@@ -7,8 +7,10 @@ import is.ru.gapl.search.IterativeDeepeningSearch;
 import is.ru.gapl.search.DepthFirstSearch;
 import is.ru.gapl.search.IterativeDeepening2PlayerSearch;
 import is.ru.gapl.search.ISearch;
+import is.ru.gapl.search.MinMax;
 import is.ru.gapl.search.SearchFactory;
 
+import org.eclipse.palamedes.gdl.core.model.IGame;
 import org.eclipse.palamedes.gdl.core.model.IGameNode;
 import org.eclipse.palamedes.gdl.core.model.IMove;
 import org.eclipse.palamedes.gdl.core.model.IReasoner;
@@ -18,12 +20,15 @@ import org.eclipse.palamedes.gdl.core.simulation.strategies.AbstractStrategy;
 public class MyExhaustiveSearchStrategy extends AbstractStrategy {
 
 	private IReasoner	reasoner;
-	private String		roleName;
+	private String		ownRoleName;
 	private long		endTime;
 	private long		startTime;
 	private IMove		bestMove;
 	private SearchFactory searchFactory;
 	private ISearch searchMethod;
+	private String[] allRoleNames;
+	private Match currentMatch;
+	private int ownRoleNum;
 
 	/**
 	 * Constructs the SinglePlayerExhaustiveSearchStrategy class
@@ -31,11 +36,11 @@ public class MyExhaustiveSearchStrategy extends AbstractStrategy {
 	public MyExhaustiveSearchStrategy() {
 	
 		
-		this.reasoner	= null;
-		this.roleName	= null;
-		this.endTime	= 0;
-		this.startTime	= 0;
-		this.bestMove	= null;
+		this.reasoner		= null;
+		this.ownRoleName	= null;
+		this.endTime		= 0;
+		this.startTime		= 0;
+		this.bestMove		= null;
 		
 		// get instance of the search factory
 		this.searchFactory = SearchFactory.getInstance();
@@ -45,6 +50,8 @@ public class MyExhaustiveSearchStrategy extends AbstractStrategy {
 		this.searchFactory.addSearchMethod("DepthFirstSearch", DepthFirstSearch.class.getCanonicalName());
 		this.searchFactory.addSearchMethod("IterativeDeepening2PlayerSearch", IterativeDeepening2PlayerSearch.class.getCanonicalName());
 		this.searchFactory.addSearchMethod("IterativeDeepeningCacheSearch", IterativeDeepeningCacheSearch.class.getCanonicalName());
+		
+		this.searchFactory.addSearchMethod("MinMax", MinMax.class.getCanonicalName());
 	}
 	
 	
@@ -52,21 +59,27 @@ public class MyExhaustiveSearchStrategy extends AbstractStrategy {
 	public void initMatch(Match initMatch) {
 		
 		super.initMatch(initMatch);
-		this.reasoner = match.getGame().getReasoner();
-		this.roleName = match.getRole();
+		this.currentMatch	= match;
+		this.reasoner		= match.getGame().getReasoner();
+		this.ownRoleName	= match.getRole();
+		this.ownRoleNum		= playerNumber;
+		this.allRoleNames 	= match.getGame().getRoleNames();
 		
 		this.bestMove = null;
 		
 		// set the timeout
 		this.setTimeout(match.getStartTime());
 		
+		System.out.println("Hi! Iam: "+playerNumber+" and I have: "+(game.getRoleCount()-1)+" oponents.");
+		
 		try {
 		
 		if(match.getGame().getRoleCount() == 1){
 			// try to create the search method
 			this.searchMethod = this.searchFactory.createSearchMethod("IterativeDeepeningSearch");
-		} else if (match.getGame().getRoleCount() == 2){
-			this.searchMethod = this.searchFactory.createSearchMethod("IterativeDeepening2PlayerSearch");
+		} else if (match.getGame().getRoleCount() >= 2){
+			this.searchMethod = this.searchFactory.createSearchMethod("MinMax");
+			this.searchMethod.init(this);
         }
 
 		} catch (SearchMethodException e) {
@@ -77,7 +90,7 @@ public class MyExhaustiveSearchStrategy extends AbstractStrategy {
 		
 		try {
 			// start searching
-			this.searchMethod.search(match.getCurrentNode().getState(), this);
+			this.searchMethod.search(match.getCurrentNode(), this);
 			
         } catch (PlayTimeOverException e) {
         	System.out.println("initMatch() stopped by time.");
@@ -96,7 +109,7 @@ public class MyExhaustiveSearchStrategy extends AbstractStrategy {
 			// set the timeout
 			setTimeout(match.getPlayTime());
 			// start searching
-			this.searchMethod.search(currentNode.getState(), this);
+			this.searchMethod.search(currentNode, this);
 			
         } catch (PlayTimeOverException e) {
         	System.out.println("initMatch() stopped by time.");
@@ -133,10 +146,6 @@ public class MyExhaustiveSearchStrategy extends AbstractStrategy {
 		return reasoner;
 	}
 
-	public String getRoleName() {
-		return roleName;
-	}
-
 	public long getEndTime() {
 		return endTime;
 	}
@@ -155,8 +164,29 @@ public class MyExhaustiveSearchStrategy extends AbstractStrategy {
 		return bestMove;
 	}
 
-
 	public void setBestMove(IMove bestMove) {
 		this.bestMove = bestMove;
+	}
+
+	public String getOwnRoleName() {
+		return ownRoleName;
+	}
+
+	public String[] getAllRoleNames() {
+		return allRoleNames;
+	}
+
+
+	public Match getCurrentMatch() {
+		return currentMatch;
+	}
+
+
+	public int getOwnRoleNum() {
+		return ownRoleNum;
+	}
+	
+	public int getMaxSteps() {
+		return this.maxSteps;
 	}
 }

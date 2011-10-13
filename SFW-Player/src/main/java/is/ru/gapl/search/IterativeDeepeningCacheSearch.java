@@ -31,8 +31,8 @@ public class IterativeDeepeningCacheSearch implements ISearch {
 	private IGameState gameState;
 	
 	
-	public IterativeDeepeningCacheSearch() {
-		
+	@Override
+	public void init(AbstractStrategy strategy) {
 		this.statesCache = new ReferenceMap(SOFT, SOFT);
 	}
 	

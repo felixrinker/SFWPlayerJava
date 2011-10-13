@@ -31,10 +31,11 @@ public class IterativeDeepeningSearch implements ISearch {
 	private IGameState gameState;
 	
 	
-	public IterativeDeepeningSearch() {
-		
+	@Override
+	public void init(AbstractStrategy strategy) {
 		this.statesCache = new ReferenceMap(SOFT, SOFT);
 	}
+	
 	
 	@Override
 	public void search(IGameNode gameNode, AbstractStrategy strategy) throws SearchMethodException, PlayTimeOverException {

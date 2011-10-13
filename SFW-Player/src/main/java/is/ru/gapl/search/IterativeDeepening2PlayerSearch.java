@@ -1,5 +1,7 @@
 package is.ru.gapl.search;
 
+import static org.apache.commons.collections.map.AbstractReferenceMap.SOFT;
+
 import java.util.HashMap;
 import java.util.Set;
 
@@ -8,6 +10,7 @@ import is.ru.gapl.exception.SearchMethodException;
 import is.ru.gapl.model.StateValue;
 import is.ru.gapl.strategy.MyExhaustiveSearchStrategy;
 
+import org.apache.commons.collections.map.ReferenceMap;
 import org.eclipse.palamedes.gdl.core.model.IGameNode;
 import org.eclipse.palamedes.gdl.core.model.IGameState;
 import org.eclipse.palamedes.gdl.core.model.IMove;
@@ -27,9 +30,9 @@ public class IterativeDeepening2PlayerSearch implements ISearch {
 	private HashMap<IGameState,StateValue> statesCache;
 	private IGameState gameState;
 	
-	public IterativeDeepening2PlayerSearch() {
-		
-		this.statesCache = new HashMap<IGameState, StateValue>();
+	@Override
+	public void init(AbstractStrategy strategy) {
+		//this.statesCache = new ReferenceMap(SOFT, SOFT);
 	}
 	
 	@Override
