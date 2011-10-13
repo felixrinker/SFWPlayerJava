@@ -2,15 +2,14 @@ package is.ru.gapl.strategy;
 
 import is.ru.gapl.exception.PlayTimeOverException;
 import is.ru.gapl.exception.SearchMethodException;
+import is.ru.gapl.search.DepthFirstSearch;
+import is.ru.gapl.search.ISearch;
+import is.ru.gapl.search.IterativeDeepening2PlayerSearch;
 import is.ru.gapl.search.IterativeDeepeningCacheSearch;
 import is.ru.gapl.search.IterativeDeepeningSearch;
-import is.ru.gapl.search.DepthFirstSearch;
-import is.ru.gapl.search.IterativeDeepening2PlayerSearch;
-import is.ru.gapl.search.ISearch;
 import is.ru.gapl.search.MinMax;
 import is.ru.gapl.search.SearchFactory;
 
-import org.eclipse.palamedes.gdl.core.model.IGame;
 import org.eclipse.palamedes.gdl.core.model.IGameNode;
 import org.eclipse.palamedes.gdl.core.model.IMove;
 import org.eclipse.palamedes.gdl.core.model.IReasoner;
@@ -63,27 +62,33 @@ public class MyExhaustiveSearchStrategy extends AbstractStrategy {
 		this.reasoner		= match.getGame().getReasoner();
 		this.ownRoleName	= match.getRole();
 		this.ownRoleNum		= playerNumber;
-		this.allRoleNames 	= match.getGame().getRoleNames();
 		
 		this.bestMove = null;
 		
 		// set the timeout
 		this.setTimeout(match.getStartTime());
 		
-		System.out.println("Hi! Iam: "+playerNumber+" and I have: "+(game.getRoleCount()-1)+" oponents.");
+		System.out.println("We paly role: "+match.getRole()+" and I have: "+(game.getRoleCount()-1)+" oponents.");
+		
+		/////////////////// INIT SEARCHING /////////////////////
 		
 		try {
-		
-		if(match.getGame().getRoleCount() == 1){
-			// try to create the search method
-			this.searchMethod = this.searchFactory.createSearchMethod("IterativeDeepeningSearch");
-		} else if (match.getGame().getRoleCount() >= 2){
-			this.searchMethod = this.searchFactory.createSearchMethod("MinMax");
-			this.searchMethod.init(this);
-        }
+			if(match.getGame().getRoleCount() == 1) {
+				// try to create the search method
+				this.searchMethod = this.searchFactory.createSearchMethod("IterativeDeepeningSearch");
+				System.out.println("We have choosen singleplayer mode");
+				
+			} else if (match.getGame().getRoleCount() >= 2){
+				// try to create the search method
+				this.searchMethod = this.searchFactory.createSearchMethod("MinMax");
+				System.out.println("We have choosen multiplayer mode");
+	        }
 
+			// init search
+			this.searchMethod.init(this);
+			
 		} catch (SearchMethodException e) {
-			System.out.println(e.getMessage());
+			System.out.println("ERROR: "+e.getMessage());
 		}
 		
 		/////////////////// START SEARCHING /////////////////////
@@ -118,6 +123,16 @@ public class MyExhaustiveSearchStrategy extends AbstractStrategy {
 		}
 		
 		return bestMove;
+	}
+	
+	/**
+	 * check the remaining playTime
+	 * 
+	 * @throws PlayTimeOverException
+	 */
+	public void checkTime() throws PlayTimeOverException {
+		
+		if(isTimeUp()) throw new PlayTimeOverException();
 	}
 
 /*********************** PRIVATE METHODS **********************************/
