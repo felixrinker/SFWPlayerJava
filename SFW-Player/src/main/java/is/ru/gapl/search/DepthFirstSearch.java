@@ -80,7 +80,7 @@ public class DepthFirstSearch implements ISearch {
 				
 				for (IMove move : moves) {
 					
-					checkTime();
+					this.strategy.checkTime();
 					
 					singleMove[0] = move;
 					IGameState newState = null;
@@ -161,7 +161,7 @@ public class DepthFirstSearch implements ISearch {
 		IMove[] singleMove = new IMove[1];
 		for (IMove move : moves) {
 			
-			checkTime();
+			this.strategy.checkTime();
 			
 			singleMove[0] = move;
 			IGameState newState = null;
@@ -190,10 +190,5 @@ public class DepthFirstSearch implements ISearch {
 		statesCache.put(nextState, new StateValue(maxScore, bestMove));
 		
 		return maxScore;
-	}
-	
-	private void checkTime() throws PlayTimeOverException {
-		
-		if(strategy.isTimeUp()) throw new PlayTimeOverException();
 	}
 }
