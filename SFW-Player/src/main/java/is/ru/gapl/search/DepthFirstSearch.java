@@ -33,6 +33,14 @@ public class DepthFirstSearch implements ISearch {
 	
 	@Override
 	public void init(AbstractStrategy strategy) {
+		
+		/**
+		 *@TODO FIX ME - unsafe cast. Solution introduce abstract strategy class or interface 
+		 */	
+		this.strategy	= (MyExhaustiveSearchStrategy) strategy;
+		this.roleName	= this.strategy.getOwnRoleName();
+		this.reasoner	= this.strategy.getReasoner();
+		
 		this.statesCache = new ReferenceMap(SOFT, SOFT);
 	}
 	
@@ -53,13 +61,6 @@ public class DepthFirstSearch implements ISearch {
 				this.strategy.setBestMove(cacheState.getBestMove());
 				throw new SearchMethodException("Found state in the cache");
 		}
-		
-		/**
-		 *@TODO FIX ME - unsafe cast. Solution introduce abstract strategy class or interface 
-		 */	
-		this.strategy	= (MyExhaustiveSearchStrategy) strategy;
-		this.roleName	= this.strategy.getOwnRoleName();
-		this.reasoner	= this.strategy.getReasoner();
 		
 		try {
 			// calculate the moves if they not set
@@ -94,8 +95,6 @@ public class DepthFirstSearch implements ISearch {
 					//System.out.println("NEW-STATE: "+newState+" :: MOVE: "+move);
 					// try to find the max score
 					newScore = maxScore(newState, depth, 0);
-					
-					
 					
 					if (newScore > maxScore) {
 						this.bestMove = move;
