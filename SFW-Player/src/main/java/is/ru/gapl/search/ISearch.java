@@ -14,6 +14,12 @@ import org.eclipse.palamedes.gdl.core.simulation.strategies.AbstractStrategy;
 public interface ISearch {
 
 	/**
+	 * 
+	 * @param strategy
+	 */
+	public void init(AbstractStrategy strategy);
+	
+	/**
 	 * Provides the search
 	 * 
 	 * @param currentNode the game state to start from
@@ -23,9 +29,4 @@ public interface ISearch {
 	 * @throws SearchMethodException 
 	 */
 	public void search(IGameNode currentNode, AbstractStrategy strategy) throws SearchMethodException, PlayTimeOverException;
-
-	/**
-	 * 
-	 */
-	public void init(AbstractStrategy strategy);
 }
