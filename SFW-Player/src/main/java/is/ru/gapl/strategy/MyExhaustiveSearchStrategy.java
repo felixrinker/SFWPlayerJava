@@ -7,7 +7,8 @@ import is.ru.gapl.search.ISearch;
 import is.ru.gapl.search.IterativeDeepening2PlayerSearch;
 import is.ru.gapl.search.IterativeDeepeningCacheSearch;
 import is.ru.gapl.search.IterativeDeepeningSearch;
-import is.ru.gapl.search.MinMax;
+import is.ru.gapl.search.MinMaxABSearch;
+import is.ru.gapl.search.MonteCarloSearch;
 import is.ru.gapl.search.SearchFactory;
 
 import org.eclipse.palamedes.gdl.core.model.IGameNode;
@@ -50,7 +51,8 @@ public class MyExhaustiveSearchStrategy extends AbstractStrategy {
 		this.searchFactory.addSearchMethod("IterativeDeepening2PlayerSearch", IterativeDeepening2PlayerSearch.class.getCanonicalName());
 		this.searchFactory.addSearchMethod("IterativeDeepeningCacheSearch", IterativeDeepeningCacheSearch.class.getCanonicalName());
 		
-		this.searchFactory.addSearchMethod("MinMax", MinMax.class.getCanonicalName());
+		this.searchFactory.addSearchMethod("MinMax", MinMaxABSearch.class.getCanonicalName());
+		this.searchFactory.addSearchMethod("MonteCarlo", MonteCarloSearch.class.getCanonicalName());
 	}
 	
 	
@@ -80,7 +82,8 @@ public class MyExhaustiveSearchStrategy extends AbstractStrategy {
 				
 			} else if (match.getGame().getRoleCount() >= 2){
 				// try to create the search method
-				this.searchMethod = this.searchFactory.createSearchMethod("MinMax");
+				this.searchMethod = this.searchFactory.createSearchMethod("MonteCarlo");
+				//this.searchMethod = this.searchFactory.createSearchMethod("MinMax");
 				System.out.println("We have choosen multiplayer mode");
 	        }
 
