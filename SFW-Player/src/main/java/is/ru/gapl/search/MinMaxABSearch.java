@@ -15,7 +15,7 @@ import org.eclipse.palamedes.gdl.core.simulation.Match;
 import org.eclipse.palamedes.gdl.core.simulation.strategies.AbstractStrategy;
 import org.eclipse.palamedes.gdl.core.simulation.strategies.FringeFrame;
 
-public class MinMax implements ISearch {
+public class MinMaxABSearch implements ISearch {
 
 	private MyExhaustiveSearchStrategy strategy;
 	private IGame game;
