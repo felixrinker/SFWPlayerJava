@@ -68,4 +68,11 @@ public class StateMCTS {
 		}
 		return returnAction;
 	}
+
+
+	@Override
+	public String toString() {
+		return "StateMCTS [numberSimulations=" + numberSimulations
+				+ ", actions=" + actions + "]";
+	}
 }
