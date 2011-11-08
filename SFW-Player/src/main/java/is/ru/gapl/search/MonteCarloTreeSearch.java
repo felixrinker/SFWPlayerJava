@@ -106,9 +106,16 @@ public class MonteCarloTreeSearch implements ISearch {
 			int index = generator.nextInt(legalMoves.length);
 			IMove[] action = new IMove[1];
 			action[0] = legalMoves[index];
-							
-			int ind = action[0].toString().indexOf("noop");
-			if( ind == -1 ) {	
+			
+			
+			if(action[0].toString().indexOf(""+this.ownRoleName) == -1) {
+				debug("oponent turn");
+				continue;
+			}
+			
+			int ind1 = action[0].toString().indexOf("noop");
+			
+			if( ind1 == -1) {	
 				//Generate the next state
 				IGameState nextNode = null;
 				try {
@@ -173,6 +180,14 @@ public class MonteCarloTreeSearch implements ISearch {
 				legalMoves = this.reasoner.getLegalMoves(ownRoleName, gameState);
 			} catch (InterruptedException e1) {
 				System.out.println("Was unable to retrieve the legal moves.");
+			}
+			if(legalMoves.length == 0) return 0;
+			if(legalMoves.length == 1) {
+				
+				if(legalMoves[0].toString().indexOf("noop") > -1) {
+					debug("not our turn");
+					return 0;
+				}
 			}
 			
 			int index = generator.nextInt(legalMoves.length);

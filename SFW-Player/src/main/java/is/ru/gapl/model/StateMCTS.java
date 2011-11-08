@@ -34,7 +34,13 @@ public class StateMCTS {
 	
 	public void increaseNumberSimulationsForAction(IMove action) {
 		
-		this.actions.get(action).numberSimulations++;
+		ActionValue move = this.actions.get(action);
+		
+		if(move == null) {
+			System.out.println("BLAA: "+action);
+			
+		}
+		move.numberSimulations++;
 	}
 	
 

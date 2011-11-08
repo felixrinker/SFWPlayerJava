@@ -10,6 +10,7 @@ import is.ru.gapl.search.IterativeDeepeningSearch;
 import is.ru.gapl.search.MinMaxABSearch;
 import is.ru.gapl.search.MonteCarloSearch;
 import is.ru.gapl.search.MonteCarloTreeSearch;
+import is.ru.gapl.search.MonteCarloTreeSearchCombined;
 import is.ru.gapl.search.SearchFactory;
 
 import org.eclipse.palamedes.gdl.core.model.IGameNode;
@@ -55,6 +56,7 @@ public class MyExhaustiveSearchStrategy extends AbstractStrategy {
 		this.searchFactory.addSearchMethod("MinMax", MinMaxABSearch.class.getCanonicalName());
 		this.searchFactory.addSearchMethod("MonteCarlo", MonteCarloSearch.class.getCanonicalName());
 		this.searchFactory.addSearchMethod("MonteCarloTree", MonteCarloTreeSearch.class.getCanonicalName());
+		this.searchFactory.addSearchMethod("MonteCarloTreeCombined", MonteCarloTreeSearchCombined.class.getCanonicalName());
 	}
 	
 	
@@ -84,7 +86,7 @@ public class MyExhaustiveSearchStrategy extends AbstractStrategy {
 				
 			} else if (match.getGame().getRoleCount() >= 2){
 				// try to create the search method
-				this.searchMethod = this.searchFactory.createSearchMethod("MonteCarloTree");
+				this.searchMethod = this.searchFactory.createSearchMethod("MonteCarloTreeCombined");
 				//this.searchMethod = this.searchFactory.createSearchMethod("MinMax");
 				System.out.println("We have choosen multiplayer mode");
 	        }
