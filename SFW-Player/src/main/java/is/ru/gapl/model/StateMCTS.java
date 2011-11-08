@@ -23,6 +23,11 @@ public class StateMCTS {
 		}
 	}
 	
+	public StateMCTS() {
+		super();
+		this.actions = new HashMap<IMove, ActionValue>();
+	}
+	
 	
 	public int getNumberSimulations() {
 		return numberSimulations;
@@ -34,21 +39,23 @@ public class StateMCTS {
 	
 	public void increaseNumberSimulationsForAction(IMove action) {
 		
-		ActionValue move = this.actions.get(action);
-		
-		if(move == null) {
-			System.out.println("BLAA: "+action);
+		if(!actions.containsKey(action)) {
+			this.actions.put(action, new ActionValue());
 			
 		}
-		move.numberSimulations++;
+		ActionValue aV = this.actions.get(action);
+		aV.numberSimulations++;
 	}
 	
 
 	public void updateAvgScoreForAction(IMove action, int score) {
 		
 		
+		if(!actions.containsKey(action)) {
+			this.actions.put(action, new ActionValue());
+			
+		}
 		ActionValue aV = this.actions.get(action);
-		
 		aV.averageScore = (aV.averageScore * aV.numberSimulations + score) /(aV.numberSimulations +1);
 	}
 	
