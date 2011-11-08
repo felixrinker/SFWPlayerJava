@@ -64,7 +64,7 @@ public final class MyPlayer extends Player {
          *       GameFactory.PROLOG is probably the fastest option, but you need
          *       to have Eclipse-Prolog installed (http://www.eclipse-clp.org/). */
         GameFactory factory 	= GameFactory.getInstance();
-        IGame 		runningGame = factory.createGame( GameFactory.JAVAPROVER,
+        IGame 		runningGame = factory.createGame( GameFactory.PROLOGPROVER,
         											  msg.getGameDescription() );
         System.out.println("MyPlayer created the game.");
 

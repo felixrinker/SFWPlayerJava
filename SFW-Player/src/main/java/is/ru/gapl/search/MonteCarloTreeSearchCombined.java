@@ -69,8 +69,7 @@ public class MonteCarloTreeSearchCombined implements ISearch {
 		
 		this.MonteCarloTree(currentNode);
 	}
-	
-	@SuppressWarnings("rawtypes")
+
 	private void MonteCarloTree(IGameNode currentNode) throws PlayTimeOverException {
 		
 		// if gameState is still in tree

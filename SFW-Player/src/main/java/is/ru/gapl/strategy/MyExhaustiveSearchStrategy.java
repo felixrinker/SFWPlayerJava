@@ -84,11 +84,16 @@ public class MyExhaustiveSearchStrategy extends AbstractStrategy {
 				this.searchMethod = this.searchFactory.createSearchMethod("DepthFirstSearch");
 				System.out.println("We have choosen singleplayer mode");
 				
-			} else if (match.getGame().getRoleCount() >= 2){
+			} else if (match.getGame().getRoleCount() == 2){
 				// try to create the search method
-				this.searchMethod = this.searchFactory.createSearchMethod("MonteCarloTreeCombined");
+				//this.searchMethod = this.searchFactory.createSearchMethod("MonteCarloTreeCombined");
+				this.searchMethod = this.searchFactory.createSearchMethod("MinMax");
+				System.out.println("We have choosen multiplayer mode MIN MAX");
+	        } else if (match.getGame().getRoleCount() >= 2){
+				// try to create the search method
+				this.searchMethod = this.searchFactory.createSearchMethod("MonteCarlo");
 				//this.searchMethod = this.searchFactory.createSearchMethod("MinMax");
-				System.out.println("We have choosen multiplayer mode");
+				System.out.println("We have choosen multiplayer mode MCTS");
 	        }
 
 			// init search
