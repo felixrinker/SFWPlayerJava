@@ -4,7 +4,6 @@ import static org.apache.commons.collections.map.AbstractReferenceMap.SOFT;
 import is.ru.gapl.exception.PlayTimeOverException;
 import is.ru.gapl.exception.SearchMethodException;
 import is.ru.gapl.model.NodeActionPair;
-import is.ru.gapl.model.StateActionPair;
 import is.ru.gapl.model.StateMCTS;
 import is.ru.gapl.strategy.MyExhaustiveSearchStrategy;
 
@@ -15,7 +14,6 @@ import java.util.Random;
 import org.apache.commons.collections.map.ReferenceMap;
 import org.eclipse.palamedes.gdl.core.model.IGame;
 import org.eclipse.palamedes.gdl.core.model.IGameNode;
-import org.eclipse.palamedes.gdl.core.model.IGameState;
 import org.eclipse.palamedes.gdl.core.model.IMove;
 import org.eclipse.palamedes.gdl.core.model.IReasoner;
 import org.eclipse.palamedes.gdl.core.simulation.Match;
@@ -108,16 +106,7 @@ public class MonteCarloTreeSearchCombined implements ISearch {
 				}
 				FringeFrame fringe = new FringeFrame(currentNode);
 				
-				List<IMove> newLActions = new ArrayList<IMove>();
-				
-				for(IMove[] ms : legalActions) {
-					IMove mo = ms[this.ownRoleNum];
-					debug(""+ms[0]+" "+ms[1]);
-						newLActions.add(mo);
-					
-				}
-				
-				this.stateTree.put(currentNode, new StateMCTS((IMove[])newLActions.toArray(new IMove[newLActions.size()])));
+				this.stateTree.put(currentNode, new StateMCTS());
 				
 				while ( fringe.hasUnexpandedMove() ) {
 		    		
