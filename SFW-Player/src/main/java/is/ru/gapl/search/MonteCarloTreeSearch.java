@@ -59,7 +59,7 @@ public class MonteCarloTreeSearch implements ISearch {
 	private void MonteCarloTree(IGameState currentGameState) throws PlayTimeOverException {
 		
 		// if gameState is still in tree
-		if(this.stateTree.containsKey(currentGameState)) {
+		if(stateTree.containsKey(currentGameState)) {
 			// get the state value
 			StateMCTS stateMCTS = (StateMCTS) this.stateTree.get(currentGameState);
 			IMove[] action = new IMove[1];
@@ -122,13 +122,14 @@ public class MonteCarloTreeSearch implements ISearch {
 				
 				// update parent state
 				this.update(gameState, action[0], score);
+				this.strategy.setBestMove(action[0]);
 				
 				if(!backTrackList.isEmpty())
 				{//Now update all other states
 					for(int i = backTrackList.size()-1; i >= 0; i--) {
 						StateActionPair sap = this.backTrackList.get(i);
 						this.update(sap.gameState, sap.action[0], score);
-						if(i == 0 ) {
+						if(i == 0 && -1 < sap.action[0].toString().indexOf("noop")) {
 							this.strategy.setBestMove(sap.action[0]);
 						}
 					}
@@ -140,12 +141,12 @@ public class MonteCarloTreeSearch implements ISearch {
 	}
 	private void update(IGameState gameState, IMove action, int score) {
 		StateMCTS stateMCTS = (StateMCTS) this.stateTree.get(gameState);
-		// Average score of action
-		stateMCTS.updateAvgScoreForAction(action, score);
 		// Number of simulation with action
 		stateMCTS.increaseNumberSimulationsForAction(action);
 		// Number of simulation with state
 		stateMCTS.increaseNumberSimulations();
+		// Average score of action
+		stateMCTS.updateAvgScoreForAction(action, score);
 	}
 	
 	private int runPlayout(IGameState gameState) throws PlayTimeOverException {
